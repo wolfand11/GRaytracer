@@ -1,0 +1,59 @@
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+### keep sln
+#*.sln
+*.vcxproj.filters
+*.user
+*.unityproj
+*.booproj
+.vs/
+Debug/
+
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+############################################ xcode project
+xcuserdata
+*xccheckout
+*xcworkspacedata
+*xcshareddata
+
+############################################ jetbrain proj
+.idea
+
+############################################ Qt Project
+build-**-Debug/
+
+############################################ custom proj
+.build
+build-Debug
+build-Release
+*.o
+libglm.a
+.qmake.stash
+*.pro.user
+.github/
+.vscode/
+
+############################################ custom GRaytracing
+/VulkanGuide/gpu-driven-rendering/build
+/VulkanGuide/gpu-driven-rendering/bin
+/VulkanGuide/gpu-driven-rendering/third_party/nvlibs
+/VulkanGuide/gpu-driven-rendering/third_party/nvidia-texture-tools/data
+
