@@ -1,10 +1,7 @@
 #include "ggameobject.h"
-#include "glog.h"
 #include "gmathutils.h"
-#include "gutils.h"
 using namespace GMath;
 using namespace std;
-
 
 void GGameObject::SetT(vec3f pos)
 {
@@ -45,19 +42,14 @@ void GGameObject::TRSInvertTRS(const mat4f* &trs, const mat4f* &invertTRS)
     invertTRS = &invertTransform;
 }
 
-
-
-std::shared_ptr<GLight> GLight::CreateLightGObj(GLightType lightType, GColor lColor, float lIntensity)
+vec3f GGameObject::forward()
 {
-    auto light = std::make_shared<GLight>(lightType);
-    light->lightInfo.lightColor = lColor;
-    light->lightInfo.lightIntensity = lIntensity;
-    return light;
+    const mat4f* trsMat; // local2World
+    const mat4f* invertTRSMat; // world2Local
+    TRSInvertTRS(trsMat, invertTRSMat);
+
+    vec4f ret = (*trsMat) * vec4f::forward;
+    return ret.xyz();
 }
 
-GLight::GLight(GLightType lightType)
-    :GGameObject(GGameObject::GGameObjectType::kLight)
-{
-    lightInfo.lightType = lightType;
-}
 

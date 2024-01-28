@@ -19,7 +19,7 @@ public:
     void SetViewport(int x, int y, int w, int h);
     void SetFov(float fov);
     GMath::vec2 NDCPosToScreenPos(GMath::vec3 ndc);
-    GMath::vec3 ScreenPosToViewPos(GMath::vec2 screenPos);
+    GMath::vec4 ScreenPosToViewPos(GMath::vec2 screenPos);
     float ToWBufferValue(float wValue);
     int viewportX;
     int viewportY;
@@ -32,8 +32,8 @@ public:
     float aspectRatio{1.0f};
     GMath::mat4f& LookAt(GMath::vec3f eyePos, GMath::vec3f lookAtPoint, GMath::vec3f up);
     void ProjInvertProj(const GMath::mat4f*& tproj,const GMath::mat4f*& tinvertProj);
-    GMath::GRay GetRay(int i, int j);
-    GColor RayColor(const GMath::GRay& ray, int depth);
+    GMath::GRay GetRay(double i, double j);
+    //GFColor RayColor(const GMath::GRay& ray, int depth);
 
 private:
     // camera

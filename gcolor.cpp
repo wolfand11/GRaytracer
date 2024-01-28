@@ -13,6 +13,16 @@ GColor GColor::gray = {128,128,128,255};
 GColor GColor::pink = {255,0,255,255};
 GColor GColor::normal = {128,128,255,0};
 
+GFColor GColor::clearF = {0,0,0,0};
+GFColor GColor::whiteF = {1,1,1,1};
+GFColor GColor::blackF = {0,0,0,1};
+GFColor GColor::redF = {1,0,0,1};
+GFColor GColor::greenF = {0,1,0,1};
+GFColor GColor::blueF = {0,0,1,1};
+GFColor GColor::grayF = {0.5,0.5,0.5,1};
+GFColor GColor::pinkF = {1,0,1,1};
+GFColor GColor::normalF = {0.5,0.5,1,0};
+
 GColor GColor::Lerp(TGAColor color1, TGAColor color2, float f)
 {
     GColor ret;
@@ -32,4 +42,14 @@ GColor GColor::Lerp(GColor color1, GColor color2, float f)
     ret.a = color1.a * f + color2.a * (1-f);
     return ret;
 
+}
+
+GFColor GColor::Lerp(GFColor color1, GFColor color2, float f)
+{
+    GFColor ret;
+    ret.SetX(color1.x() * f + color2.x() * (1-f));
+    ret.SetY(color1.y() * f + color2.y() * (1-f));
+    ret.SetZ(color1.z() * f + color2.z() * (1-f));
+    ret.SetW(color1.w() * f + color2.w() * (1-f));
+    return ret;
 }

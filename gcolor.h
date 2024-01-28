@@ -5,6 +5,8 @@
 #include "tgaimage.h"
 
 #define ColorChannelType unsigned int
+typedef GMath::vec4f GFColor;
+
 
 struct GColor
 {
@@ -27,6 +29,16 @@ struct GColor
         return (r==0 && g==0 && b==0);
     }
 
+    GFColor ToFloat01Color()
+    {
+        return ToFloat01Color(*this);
+    }
+
+    GFColor ToFloatColor()
+    {
+        return ToFloatColor(*this);
+    }
+
     static GColor clear;
     static GColor white;
     static GColor black;
@@ -36,6 +48,16 @@ struct GColor
     static GColor gray;
     static GColor pink;
     static GColor normal;
+
+    static GFColor clearF;
+    static GFColor whiteF;
+    static GFColor blackF;
+    static GFColor redF;
+    static GFColor greenF;
+    static GFColor blueF;
+    static GFColor grayF;
+    static GFColor pinkF;
+    static GFColor normalF;
 
     static GMath::vec4 FastTonemap(GMath::vec4 color)
     {
@@ -47,9 +69,9 @@ struct GColor
         return ret;
     }
 
-    static GMath::vec4f ToFloat01Color(const GColor& color)
+    static GFColor ToFloat01Color(const GColor& color)
     {
-        GMath::vec4f ret;
+        GFColor ret;
         ret.SetX(((float)color.r)/255.0);
         ret.SetY(((float)color.g)/255.0);
         ret.SetZ(((float)color.b)/255.0);
@@ -57,9 +79,9 @@ struct GColor
         return ret;
     }
 
-    static GMath::vec4f ToFloatColor(const GColor& color)
+    static GFColor ToFloatColor(const GColor& color)
     {
-        GMath::vec4f ret;
+        GFColor ret;
         ret.SetX((float)color.r);
         ret.SetY((float)color.g);
         ret.SetZ((float)color.b);
@@ -99,15 +121,11 @@ struct GColor
 
     static GColor Lerp(TGAColor color1, TGAColor color2, float f);
     static GColor Lerp(GColor color1, GColor color2, float f);
+    static GFColor Lerp(GFColor color1, GFColor color2, float f);
 
-    GMath::vec4f ToFloat01Color()
+    static bool IsBlack(GFColor color)
     {
-        return ToFloat01Color(*this);
-    }
-
-    GMath::vec4f ToFloatColor()
-    {
-        return ToFloatColor(*this);
+        return color.x()==0 && color.y()==0 && color.z()==0;
     }
 };
 
@@ -120,9 +138,9 @@ struct GHDRColor
 
     float intensity;
 
-    static GMath::vec4f ToFloatColor(const GHDRColor& hdrColor)
+    static GFColor ToFloatColor(const GHDRColor& hdrColor)
     {
-        GMath::vec4f ret;
+        GFColor ret;
         float factor = std::pow(2, hdrColor.intensity);
         ret.SetX(factor * float(hdrColor.r)/255);
         ret.SetY(factor * float(hdrColor.g)/255);
@@ -131,9 +149,10 @@ struct GHDRColor
         return ret;
     }
 
-    GMath::vec4f ToFloatColor()
+    GFColor ToFloatColor()
     {
         return ToFloatColor(*this);
     }
 };
+
 #endif // GCOLOR_H

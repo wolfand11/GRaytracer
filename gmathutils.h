@@ -1,6 +1,8 @@
 #ifndef GMATHUTILS_H
 #define GMATHUTILS_H
 #include "gmath.h"
+#include "gray.h"
+
 
 class GMathUtils
 {
@@ -12,6 +14,8 @@ public:
         v = std::max(std::min(v, (T)1), (T)0);
         return v;
     }
+
+    // vec helper
 
     // matrix helper
     static GMath::mat4 LookAt(GMath::vec3 eyePos, GMath::vec3 lookAtPoint, GMath::vec3 up);
@@ -29,7 +33,8 @@ public:
 
     // color helper
 
-    //
+    // ray helper
+    static bool intersect(const GMath::GRay& r, GMath::interval ray_t, const GMath::aabb& bbox);
 };
 
 #endif // GMATHUTILS_H

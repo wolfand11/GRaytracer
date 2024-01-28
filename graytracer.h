@@ -10,6 +10,7 @@
 #include <condition_variable>
 #include <QVector2D>
 #include "gscene.h"
+#include "gintegrator.h"
 
 namespace Ui {
 class GRaytracer;
@@ -48,11 +49,13 @@ private:
     QImage middleBuffer;
 
     GScene scene;
+    std::shared_ptr<GIntegrator> integrator;
 
     QVector2D prePressedPos{0,0};
     int timeCounter{0};
     bool isNeedExist;
     bool isRenderingCompleted;
+    bool isSyncedColor;
     void DoRendering();
     std::mutex mtx;
     std::condition_variable hasDrawTask;

@@ -1,21 +1,6 @@
 #ifndef GGAMEOBJECT_H
 #define GGAMEOBJECT_H
 #include "gmath.h"
-#include "gcolor.h"
-
-enum GLightType
-{
-    kLTDirection,
-    kLTPoint,
-};
-
-struct GLightInfo
-{
-    GColor lightColor;
-    float lightIntensity;
-    GLightType lightType;
-    GMath::vec3 lightPosOrDir;
-};
 
 class GGameObject
 {
@@ -53,15 +38,6 @@ protected:
     bool _trs_dirty = true;
     GMath::mat4f transform;
     GMath::mat4f invertTransform;
-};
-
-class GLight : public GGameObject
-{
-public:
-    // light
-    static std::shared_ptr<GLight> CreateLightGObj(GLightType lightType, GColor lColor=GColor::white, float lIntensity=1);
-    GLight(GLightType lightType);
-    GLightInfo lightInfo;
 };
 
 #endif // GGAMEOBJECT_H

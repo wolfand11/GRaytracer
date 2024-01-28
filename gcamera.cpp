@@ -48,7 +48,7 @@ vec2 GCamera::NDCPosToScreenPos(vec3 ndc)
     return ret;
 }
 
-vec3 GCamera::ScreenPosToViewPos(GMath::vec2 screenPos)
+vec4 GCamera::ScreenPosToViewPos(GMath::vec2 screenPos)
 {
     vec2 normalizedScreenPos;
     normalizedScreenPos.SetX((screenPos.x()-viewportX)/viewportW * 2.0 - 1.0);
@@ -62,8 +62,8 @@ vec3 GCamera::ScreenPosToViewPos(GMath::vec2 screenPos)
     const mat4f* invertProjMat;
     ProjInvertProj(projMat, invertProjMat);
     vec4 viewPos = (*invertProjMat) * (vec4f)homogeneousPos;
-    vec3 ret(viewPos.x(),viewPos.y(),viewPos.z());
-    return ret;
+    viewPos.SetW(1);
+    return viewPos;
 }
 
 float GCamera::ToWBufferValue(float wValue)
@@ -124,19 +124,27 @@ void GCamera::ProjInvertProj(const mat4f*& tproj,const mat4f*& tinvertProj)
     tinvertProj = &invertProjMat;
 }
 
-GRay GCamera::GetRay(int i, int j)
+GRay GCamera::GetRay(double i, double j)
 {
     GRay r;
-    vec3 viewPos = ScreenPosToViewPos(vec2(i,j));
-    r.dir = viewPos;
+    vec4 viewPos = ScreenPosToViewPos(vec2(i,j));
+    const mat4f* trsMat; // view2World
+    const mat4f* invertTRSMat; // world2View
+    TRSInvertTRS(trsMat, invertTRSMat);
+    vec4 wPos =  (*trsMat) * (vec4f)viewPos;
+    r.origin = _position;
+    r.dir = vec3(wPos.x()-_position.x(), wPos.y()-_position.y(), wPos.z()-_position.z());
+    r.dir.normalize();
     return r;
 }
 
-GColor GCamera::RayColor(const GMath::GRay &ray, int depth)
+/*
+GFColor GCamera::RayColor(const GMath::GRay &ray, int depth)
 {
     vec3 normalizedDir = ray.dir;
     normalizedDir.normalize();
     auto a = 0.5 * (normalizedDir.y() + 1.0);
-    GColor ret = GColor::Lerp(GColor::FromFloat01Color(vec4(0.5,0.7,1.0,1.0)), GColor::white, a);
+    GFColor ret = GColor::Lerp(vec4f(0.5,0.7,1.0,1.0), GColor::whiteF, a);
     return ret;
 }
+*/

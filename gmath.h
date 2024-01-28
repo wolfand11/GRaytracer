@@ -7,11 +7,15 @@
 #include <string>
 
 #define _USE_MATH_DEFINES
+
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
+#define M_INVERSE_PI (1.0/3.14159265358979323846)
 #endif
+
 #ifndef M_PIl
 #define M_PIl (3.14159265358979323846264338327950288)
+#define M_INVERSE_PIl (1.0/3.14159265358979323846264338327950288)
 #endif
 
 namespace GMath
@@ -60,6 +64,9 @@ struct GVect
 
     static const GVect<T,n> zero;
     static const GVect<T,n> one;
+    static const GVect<T,n> up;
+    static const GVect<T,n> forward;
+    static const GVect<T,n> right;
 
     T x() const { return data[0]; }
     T& x() { return data[0]; }
@@ -76,6 +83,38 @@ struct GVect
     T w() const { return data[3]; }
     T& w() { return data[3]; }
     void SetW(T v){ data[3]=v; }
+
+    GVect<T, 3> xyz() const
+    {
+        GVect<T, 3> ret(data[0], data[1], data[2]);
+        return ret;
+    }
+    void SetXYZ(T x, T y, T z)
+    {
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+    }
+
+    T max()
+    {
+        T ret = data[0];
+        for(int i=1; i<n; i++)
+        {
+            ret = std::max(ret, data[i]);
+        }
+        return ret;
+    }
+
+    T min()
+    {
+        T ret = data[0];
+        for(int i=1; i<n; i++)
+        {
+            ret = std::min(ret, data[i]);
+        }
+        return ret;
+    }
 
     T data[n] = {};
 };
@@ -486,10 +525,68 @@ public:
 
     static const GInterval<T> empty;
     static const GInterval<T> universe;
+    static const GInterval<T> init;
 };
 
 typedef GInterval<float> intervalf;
 typedef GInterval<double> interval;
+
+template<typename T>
+struct GAABB
+{
+public:
+    GInterval<T> x,y,z;
+
+    GAABB()=default;
+
+    GAABB(const GInterval<T>& ix, const GInterval<T>& iy, const GInterval<T>& iz)
+        :x(ix),y(iy),z(iz)
+    {}
+
+    GAABB(const GVect<T,3>& a, const GVect<T,3>& b)
+    {
+        x = GInterval<T>(std::min(a[0], b[0]), std::max(a[0], b[0]));
+        y = GInterval<T>(std::min(a[1], b[1]), std::max(a[1], b[1]));
+        z = GInterval<T>(std::min(a[2], b[2]), std::max(a[2], b[2]));
+    }
+
+    GAABB(const GAABB<T>& box0, const GAABB<T>& box1)
+    {
+        x = GInterval<T>(box0.x, box1.x);
+        y = GInterval<T>(box0.y, box1.y);
+        z = GInterval<T>(box0.z, box1.z);
+    }
+
+    GAABB<T> pad(T delta=0.0001)
+    {
+        GInterval<T> new_x = (x.size()>=delta) ? x : x.expand(delta);
+        GInterval<T> new_y = (y.size()>=delta) ? y : y.expand(delta);
+        GInterval<T> new_z = (z.size()>=delta) ? z : z.expand(delta);
+        return GAABB<T>(new_x, new_y, new_z);
+    }
+
+    const GInterval<T>& axis(int n) const
+    {
+        if(n==1)return y;
+        if(n==2)return z;
+        return x;
+    }
+};
+
+template <typename T>
+GAABB<T> operator+(const GAABB<T>& bbox, const GVect<T,3> offset)
+{
+    return GAABB<T>(bbox.x + offset.x, bbox.y+offset.y, bbox.z+offset.z);
+}
+
+template <typename T>
+GAABB<T> operator+(const GVect<T,3> offset,const GAABB<T>& bbox)
+{
+    return bbox + offset;
+}
+
+typedef GAABB<float> aabbf;
+typedef GAABB<double> aabb;
 
 }
 #endif // GMATH_H

@@ -6,6 +6,8 @@
 #include "gmath.h"
 #include "gutils.h"
 #include <QDoubleValidator>
+#include "gmaterial.h"
+#include "glight.h"
 using namespace GMath;
 
 static void CopyColorBufferToImage(GColorBuffer* colorBuffer, QImage* image)
@@ -43,6 +45,7 @@ GRaytracer::GRaytracer(QWidget *parent) :
 
     isNeedExist = false;
     isRenderingCompleted = true;
+    isSyncedColor = true;
     renderingThread = std::thread(&GRaytracer::DoRendering, this);
     renderingThread.detach();
 
@@ -53,6 +56,8 @@ GRaytracer::GRaytracer(QWidget *parent) :
     ui->rotationYLineEdit->setValidator(new QDoubleValidator(this));
     ui->rotationZLineEdit->setValidator(new QDoubleValidator(this));
     ui->fovLineEdit->setValidator(new QDoubleValidator(this));
+    ui->sppEdit->setValidator(new QDoubleValidator(this));
+    ui->depthLineEdit->setValidator(new QDoubleValidator(this));
     RefreshUI();
     connect(ui->poxXLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
     connect(ui->poxYLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
@@ -61,8 +66,8 @@ GRaytracer::GRaytracer(QWidget *parent) :
     connect(ui->rotationYLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
     connect(ui->rotationZLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
     connect(ui->fovLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
-    connect(ui->fillModeCB, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(on_drawProp_changed()));
-    connect(ui->cullModeCB, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(on_drawProp_changed()));
+    connect(ui->sppEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
+    connect(ui->depthLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
 }
 
 GRaytracer::~GRaytracer()
@@ -93,7 +98,7 @@ void GRaytracer::mousePressEvent(QMouseEvent *event)
 void GRaytracer::CreateScene()
 {
     // light
-    auto lightGObj = GLight::CreateLightGObj(GLightType::kLTDirection);
+    auto lightGObj = std::make_shared<GDirectionalLight>();
     lightGObj->SetR(vec3f(50,-50,0));
     scene.lights.push_back(lightGObj);
 
@@ -104,64 +109,19 @@ void GRaytracer::CreateScene()
     scene.camera = cameraGObj;
 
     // models
-    // cube
-    auto cubeGObj = GModel::CreateModelGObj(GModelType::kMTObj, GUtils::GetAbsPath("models/cube.obj"));
-    cubeGObj->SetR(vec3f(-25,0.0f,0.0f));
-    //scene.models.push_back(cubeGObj);
-
-    // floor
-    auto floorGObj = GModel::CreateModelGObj(GModelType::kMTObj, GUtils::GetAbsPath("models/floor.obj"), false);
-    floorGObj->model.init_texture(GMipmapType::kMipmapAnisotropy);
-    //floorGObj.SetS(vec3f(1, 1, 1));
-    //floorGObj.SetT(vec3f(0,1,0));
-    //floorGObj.SetR(vec3f(45,0,0));
-    scene.models.push_back(floorGObj);
-
-    // diablo
-    auto diablo3GObj = GModel::CreateModelGObj(GModelType::kMTObj, GUtils::GetAbsPath("models/diablo3_pose/diablo3_pose.obj"), false);
-    diablo3GObj->model.init_texture(GMipmapType::kMipmapAnisotropy, GMipmapType::kMipmapAnisotropy);
-    diablo3GObj->SetR(vec3f(0,180,0));
-    scene.models.push_back(diablo3GObj);
-
-    // sphere
-    auto sphereGObj = GModel::CreateModelGObj(GModelType::kMTObj, GUtils::GetAbsPath("models/sphere.obj"));
-    sphereGObj->SetT(vec3f(0,0,-0.9));
-    //scene.models.push_back(sphereGObj);
-
-    // african head
-    auto africanHeadGObj = GModel::CreateModelGObj(GModelType::kMTObj, GUtils::GetAbsPath("models/african_head/african_head.obj"));
-    //scene.models.push_back(africanHeadGObj);
-
-    // triangle
-    auto triangleGObj = GModel::CreateModelGObj(GModelType::kMTObj, GUtils::GetAbsPath("models/triangle.obj"));
-    //triangleGObj.InitShader(GLAPI, GShaderType::kSTDefault, {std::make_tuple(GRenderBufferType::kRBFront, true)});
-    triangleGObj->depthMask = false;
-    //triangleGObj.modelShader->diffuseColor = GColor(255,255,255,100);
-    //scene.models.push_back(triangleGObj);
-
-    for(auto model: scene.models)
-    {
-        //model.SetupDraw(GLAPI);
-    }
+    auto redLambertMat = std::make_shared<GLambertianMaterial>(GColor::redF);
+    auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
+    sphereGObj0->SetT(vec3f(0, 0, 1));
+    scene.models.push_back(sphereGObj0);
+    auto grayLambertMat = std::make_shared<GLambertianMaterial>(GColor::grayF);
+    auto sphereGObj1 = std::make_shared<GSphereModel>(100, redLambertMat);
+    sphereGObj1->SetT(vec3f(0, -100, 1));
+    scene.models.push_back(sphereGObj1);
 }
 
 void GRaytracer::SetupGRaytracer()
 {
-    //GLAPI = new GGraphicLibAPI();
-    //frameBuffer = GLAPI->GenFrameBuffer();
-    //assert(frameBuffer!=nullptr);
-    //GLAPI->BindFrameBuffer(frameBuffer);
-    //colorBuffer = GLAPI->GenRenderBuffer(GUtils::screenWidth, GUtils::screenHeight);
-    //assert(colorBuffer!=nullptr);
-    //GLAPI->AttachRenderBufferToFrameBuffer(frameBuffer, colorBuffer, GRenderBufferType::kRBFront);
-    //GLAPI->DrawRenderBuffer({GRenderBufferType::kRBFront});
-    //GLAPI->Clear(GColor::black);
-    //depthBuffer = GLAPI->GenDepthStencilBuffer(GUtils::screenWidth, GUtils::screenHeight);
-    //GLAPI->AttachRenderBufferToFrameBuffer(frameBuffer, depthBuffer);
-    //GLAPI->ClearDepth(1.0f);
-    // obj vertex is CounterClockwise, but obj face is Clockwise
-    //GLAPI->SetFrontFace(GFrontFace::kClockwise);
-    //GLAPI->SetCullFace(GCullFaceType::kFTBack);
+    integrator = std::make_shared<GWhittedIntegrator>();
 }
 
 void GRaytracer::RefreshUI()
@@ -176,6 +136,8 @@ void GRaytracer::RefreshUI()
     ui->rotationYLineEdit->setText(QString("%1").arg(mainCamera->rotation().y()));
     ui->rotationZLineEdit->setText(QString("%1").arg(mainCamera->rotation().z()));
     ui->fovLineEdit->setText(QString("%1").arg(mainCamera->fov));
+    ui->sppEdit->setText(QString("%1").arg(integrator->spp));
+    ui->depthLineEdit->setText(QString("%1").arg(integrator->maxDepth));
     //ui->fillModeCB->setCurrentIndex((int)GLAPI->activePolygonMode);
     //ui->depthBModeCB->setCurrentIndex(GLAPI->enableWBuffer ? 1 : 0);
     //ui->cullModeCB->setCurrentIndex((int)GLAPI->cullFaceType);
@@ -190,6 +152,7 @@ void GRaytracer::DoDraw()
     OnPreDraw();
     timeCounter = 0;
     isRenderingCompleted = false;
+    isSyncedColor = false;
 
     GLog::LogInfo("==> notify");
     hasDrawTask.notify_one();
@@ -197,8 +160,13 @@ void GRaytracer::DoDraw()
 
 void GRaytracer::OnPostDraw()
 {
-    CopyColorBufferToImage(&scene.film, &middleBuffer);
-    ui->canvas->setPixmap(QPixmap::fromImage(middleBuffer));
+    if(!isSyncedColor)
+    {
+        CopyColorBufferToImage(&scene.film, &middleBuffer);
+        ui->canvas->setPixmap(QPixmap::fromImage(middleBuffer));
+
+        isSyncedColor = true;
+    }
 }
 
 void GRaytracer::on_doDrawBtn_clicked()
@@ -226,6 +194,8 @@ void GRaytracer::on_drawProp_changed()
     rot.SetZ(ui->rotationZLineEdit->text().toFloat());
     mainCamera->SetR(rot);
     mainCamera->SetFov(ui->fovLineEdit->text().toFloat());
+    integrator->spp = std::max(ui->sppEdit->text().toInt(), 1);
+    integrator->maxDepth = std::max(ui->depthLineEdit->text().toInt(), 1);
 }
 
 QString _msg;
@@ -271,27 +241,12 @@ void GRaytracer::DoRendering()
             break;
         }
 
-        //GLAPI->Clear(GColor::black);
-        //GLAPI->ClearDepth(1.0f);
         if(scene.camera==nullptr) continue;
         auto currentCam = scene.camera.get();
         GCamera::activeCamera = currentCam;
 
-        for(auto& model: scene.models)
-        {
-            //model.DrawModel(GLAPI);
-        }
+        integrator->Render(scene);
 
-        for(int j=currentCam->viewportY; j<currentCam->viewportH; j++)
-        {
-            GLog::LogInfo("%d/%d", j, currentCam->viewportH);
-            for(int i=currentCam->viewportX; i<currentCam->viewportW; i++)
-            {
-                auto ray = currentCam->GetRay(i, j);
-                GColor color = currentCam->RayColor(ray, 1);
-                scene.film.SetColor(i,j, color);
-            }
-        }
         isRenderingCompleted = true;
     }
     GLog::LogInfo("==> exist!");

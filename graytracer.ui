@@ -445,115 +445,24 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="cullModeLabel">
+           <widget class="QLabel" name="sppLabel">
             <property name="text">
-             <string>Cull Mode</string>
+             <string>SPP</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="cullModeCB">
-            <item>
-             <property name="text">
-              <string>None</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Front</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Back</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UseShaderSetting</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QLineEdit" name="sppEdit"/>
           </item>
           <item>
-           <widget class="QLabel" name="polygonMLabel">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>25</height>
-             </size>
-            </property>
+           <widget class="QLabel" name="depthLabel">
             <property name="text">
-             <string>PolygonMode</string>
+             <string>MaxDepth</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="fillModeCB">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="editable">
-             <bool>false</bool>
-            </property>
-            <property name="currentIndex">
-             <number>2</number>
-            </property>
-            <item>
-             <property name="text">
-              <string>PointMode</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>LineMode</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>FillMode</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="depthBMLabel">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>DepthBufferMode</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="depthBModeCB">
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <item>
-             <property name="text">
-              <string>DepthBuffer</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>WBuffer</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QLineEdit" name="depthLineEdit"/>
           </item>
          </layout>
         </widget>

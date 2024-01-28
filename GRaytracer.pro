@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = GRaster
+TARGET = GRaytracer
 TEMPLATE = app
 CONFIG += console c++14
 QMAKE_CXXFLAGS += -ftemplate-backtrace-limit=0
@@ -26,30 +26,40 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+        gbsdf.cpp \
         gcamera.cpp \
         gcolor.cpp \
         ggameobject.cpp \
+        gintegrator.cpp \
+        glight.cpp \
+        gmaterial.cpp \
         gmath.cpp \
         gmathutils.cpp \
         gmodel.cpp \
         gray.cpp \
         graytracer.cpp \
+        gsampler.cpp \
         gutils.cpp \
         main.cpp \
         tgaimage.cpp
 
 HEADERS += \
+        gbsdf.h \
         gbuffer.h \
         gcamera.h \
         gcolor.h \
         ggameobject.h \
         ggraphiclibdefine.h \
+        gintegrator.h \
+        glight.h \
         glog.h \
+        gmaterial.h \
         gmath.h \
         gmathutils.h \
         gmodel.h \
         gray.h \
         graytracer.h \
+        gsampler.h \
         gscene.h \
         gutils.h \
         tgaimage.h
