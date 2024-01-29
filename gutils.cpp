@@ -8,6 +8,7 @@ using namespace std;
 
 int GUtils::screenWidth = 500;
 int GUtils::screenHeight = 500;
+float GUtils::worldSize= 2000.f;
 
 float GUtils::screenAspectRatio()
 {

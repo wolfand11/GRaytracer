@@ -1,5 +1,6 @@
 #include "glight.h"
 #include "gscene.h"
+#include "gutils.h"
 using namespace GMath;
 
 GLight::GLight(GLightType lightType, GFColor lColor)
@@ -19,16 +20,33 @@ GFColor GLight::Sample_Li(const GScene &scene, const GMath::GSurfaceInteraction 
 
 GFColor GDirectionalLight::Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction &isect, vec3 &wi, float *pdf)
 {
-    // TODO
-    wi = forward();
+    wi = -forward();
     *pdf = 1;
+    vec3 pOutside = isect.p + wi * GUtils::worldSize;
+    vec3 rayDir = pOutside - isect.p;
+    interval ray_t(0.001, rayDir.length());
+    GRay shadowRay(isect.p, rayDir.normalize());
+    GSurfaceInteraction newIsect;
+    if(!scene.intersect(shadowRay, ray_t, newIsect))
+    {
+        return lightColor;
+    }
     return GColor::blackF;
 }
 
 GFColor GPointLight::Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction &isect, vec3 &wi, float *pdf)
 {
-    // TODO
+    vec3 rayDir = (vec3)_position - isect.p;
+    interval ray_t(0.001, rayDir.length());
+    wi = rayDir;
+    wi.normalize();
     *pdf = 1;
+    GRay shadowRay(isect.p, wi);
+    GSurfaceInteraction newIsect;
+    if(!scene.intersect(shadowRay, ray_t, newIsect))
+    {
+        return lightColor / rayDir.length2();
+    }
     return GColor::blackF;
 }
 
@@ -38,9 +56,16 @@ GFColor GSkyLight::Le(const GMath::GRay &ray)
     normalizedDir.normalize();
     auto t = dot(normalizedDir, vec3::up);
     GFColor ret = GColor::blackF;
+    GFColor sky = vec4f(0.5,0.7,1.0,1.0);
+    GFColor ground = vec4f(0.68,0.5,0.15,1.0);
+    GFColor dark = vec4f(0.3, 0.3, 0.2, 1.0);
     if(t>=0)
     {
-        ret = GColor::Lerp(vec4f(0.5,0.7,1.0,1.0), GColor::whiteF, t);
+        ret = GColor::Lerp(sky, ground, t);
+    }
+    else
+    {
+        ret = GColor::Lerp(dark, ground, -t);
     }
     return ret;
 }
@@ -56,7 +81,7 @@ bool GSphereLight::intersect(const GMath::GRay &ray, GMath::interval ray_t, GMat
     sphere->center = _position;
     if(sphere->intersect(ray, ray_t, isect))
     {
-        //isect.mateiral = mateiral;
+        //isect.material = material;
         return true;
     }
     return false;

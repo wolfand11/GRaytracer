@@ -69,6 +69,16 @@ struct GColor
         return ret;
     }
 
+    static GColor LinearToGamma(const GColor& color)
+    {
+        GFColor fColor = ToFloat01Color(color);
+        fColor.SetX(std::pow(fColor.x(), 1.0/2.2));
+        fColor.SetY(std::pow(fColor.y(), 1.0/2.2));
+        fColor.SetZ(std::pow(fColor.z(), 1.0/2.2));
+        fColor.SetW(1);
+        return FromFloat01Color(fColor);
+    }
+
     static GFColor ToFloat01Color(const GColor& color)
     {
         GFColor ret;

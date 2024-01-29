@@ -221,6 +221,12 @@ T dot(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
     return ret;
 }
 
+template <typename T, int n>
+T absDot(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
+{
+    return std::abs(dot(lhs, rhs));
+}
+
 template <typename T, int n, int m>
 GVect<T,n> embed(const GVect<T,m>& v, const T fill)
 {
@@ -243,6 +249,12 @@ GVect<T,n> proj(const GVect<T,m>& v)
         ret[i] = v[i];
     }
     return ret;
+}
+
+template <typename T, int n>
+T reflect(const GVect<T,n>& v, const GVect<T,n>& normal)
+{
+    return v - 2*dot(v,normal)*normal;
 }
 
 template <typename T, int n>

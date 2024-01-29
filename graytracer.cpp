@@ -19,6 +19,7 @@ static void CopyColorBufferToImage(GColorBuffer* colorBuffer, QImage* image)
         {
             // image origin is top left corner
             GColor color = colorBuffer->GetColor(i, colorBuffer->height - j - 1);
+            color = GColor::LinearToGamma(color);
             image->setPixelColor(i, j, QColor(color.r,color.g,color.b,color.a));
         }
     }
@@ -98,30 +99,54 @@ void GRaytracer::mousePressEvent(QMouseEvent *event)
 void GRaytracer::CreateScene()
 {
     // light
-    auto lightGObj = std::make_shared<GDirectionalLight>();
-    lightGObj->SetR(vec3f(50,-50,0));
-    scene.lights.push_back(lightGObj);
+    {
+        auto lightGObj = std::make_shared<GDirectionalLight>();
+        lightGObj->SetR(vec3f(50,0,0));
+        scene.lights.push_back(lightGObj);
+    }
+    {
+        auto skyLightGObj = std::make_shared<GSkyLight>();
+        scene.lights.push_back(skyLightGObj);
+    }
 
     // camera
     auto cameraGObj = GCamera::CreateProjCamera(1, 2000, 60);
-    cameraGObj->LookAt(vec3f(0,0,-2), vec3f(0,0,0), vec3f(0,1,0));
+    cameraGObj->LookAt(vec3f(0,1,-4), vec3f(0,1,0), vec3f(0,1,0));
     cameraGObj->SetViewport(0, 0, GUtils::screenWidth, GUtils::screenHeight);
     scene.camera = cameraGObj;
 
     // models
     auto redLambertMat = std::make_shared<GLambertianMaterial>(GColor::redF);
-    auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
-    sphereGObj0->SetT(vec3f(0, 0, 1));
-    scene.models.push_back(sphereGObj0);
+    auto greenLambertMat = std::make_shared<GLambertianMaterial>(GColor::greenF);
     auto grayLambertMat = std::make_shared<GLambertianMaterial>(GColor::grayF);
-    auto sphereGObj1 = std::make_shared<GSphereModel>(100, redLambertMat);
-    sphereGObj1->SetT(vec3f(0, -100, 1));
-    scene.models.push_back(sphereGObj1);
+    {
+        auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
+        sphereGObj0->SetT(vec3f(0, 0.5, 1));
+        scene.models.push_back(sphereGObj0);
+    }
+    {
+        auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
+        sphereGObj2->SetT(vec3f(-1.2, 0.5, 1));
+        scene.models.push_back(sphereGObj2);
+    }
+    {
+        auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
+        sphereGObj3->SetT(vec3f(1.2, 0.5, 1));
+        scene.models.push_back(sphereGObj3);
+    }
+    {
+        auto sphereGObj1 = std::make_shared<GSphereModel>(100, grayLambertMat);
+        //auto sphereGObj1 = std::make_shared<GSphereModel>(100, redLambertMat);
+        sphereGObj1->SetT(vec3f(0, -100, 1));
+        scene.models.push_back(sphereGObj1);
+    }
 }
 
 void GRaytracer::SetupGRaytracer()
 {
-    integrator = std::make_shared<GWhittedIntegrator>();
+    integrator = std::make_shared<GIntegrator>();
+    integrator->maxDepth = 5;
+    integrator->spp = 5;
 }
 
 void GRaytracer::RefreshUI()

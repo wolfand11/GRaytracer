@@ -26,7 +26,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        gbsdf.cpp \
         gcamera.cpp \
         gcolor.cpp \
         ggameobject.cpp \
@@ -44,7 +43,6 @@ SOURCES += \
         tgaimage.cpp
 
 HEADERS += \
-        gbsdf.h \
         gbuffer.h \
         gcamera.h \
         gcolor.h \

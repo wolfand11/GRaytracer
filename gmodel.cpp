@@ -48,7 +48,7 @@ bool GSphereModel::intersect(const GMath::GRay &ray, GMath::interval ray_t, GMat
     sphere.center = _position;
     if(sphere.intersect(ray, ray_t, isect))
     {
-        isect.mateiral = mateiral;
+        isect.material = material;
         return true;
     }
     return false;

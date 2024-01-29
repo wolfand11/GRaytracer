@@ -24,6 +24,7 @@ public:
     static GMath::vec3f RotationMatrixToEulerAngle(GMath::mat4f matrix);
     static GMath::mat4f EulerAngleToRotationMatrix(GMath::vec3f eulerAngle);
     static GMath::mat4f TRS(GMath::vec3f& translate, GMath::vec3f& rotation, GMath::vec3f& scale);
+    static GMath::mat3f RotationMatrix(GMath::vec3f fromV, GMath::vec3f toV);
 
     // radian degree
     static float Rad2Deg(float rad);

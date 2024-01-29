@@ -18,6 +18,7 @@ public:
     static int screenWidth;
     static int screenHeight;
     static float screenAspectRatio();
+    static float worldSize;
 
     static std::string GetProjRootPath();
     static std::string GetAbsPath(const std::string& relativePath);

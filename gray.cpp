@@ -20,11 +20,6 @@ GRayDifferential::GRayDifferential(vec3 originX, vec3 dirX, vec3 originY, vec3 d
 {
 }
 
-void GSurfaceInteraction::ComputeScatteringFunctions()
-{
-    mateiral->ComputeScatteringFunctions(this);
-}
-
 GFColor GSurfaceInteraction::Le(const GScene& scene, const vec3 &w) const
 {
     if(light!=nullptr)

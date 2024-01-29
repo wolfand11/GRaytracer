@@ -1,18 +1,31 @@
 #include "gmaterial.h"
-#include "gbsdf.h"
+#include "gsampler.h"
+#include "gmathutils.h"
+
 using namespace std;
 using namespace GMath;
 
-void GLambertianMaterial::ComputeScatteringFunctions(GMath::GSurfaceInteraction *isect)
+GFColor GMaterial::Sample_f(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi, float& pdf) const
 {
-    // TODO geometry normal, shading normal
-    isect->bsdf = make_shared<GBSDF>(isect->normal, isect->normal);
-    if(!GColor::IsBlack(Kd))
+    wi = GSampler::CosineSampleHemisphere();
+    auto rot = GMathUtils::RotationMatrix(vec3::up, normal);
+    wi = rot * (vec3f)wi;
+    if(dot(wi, normal) < 0)
     {
-        vec3 normalColor = (isect->normal + vec3::one) * 0.5;
-        GFColor normalFColor = GFColor(normalColor.x(), normalColor.y(), normalColor.z(), 1);
-        //auto lambertianReflection = make_shared<GLambertianReflection>(normalFColor);
-        auto lambertianReflection = make_shared<GLambertianReflection>(Kd);
-        isect->bsdf->bxdfs.push_back(lambertianReflection);
+        wi = -wi;
     }
+    pdf = Pdf(normal, wo, wi);
+    return f(normal, wo, wi);
+}
+
+float GMaterial::Pdf(const GMath::vec3 &normal, const GMath::vec3 &wo, GMath::vec3 &wi) const
+{
+    float cosThetaI = dot(wi, normal);
+    bool isInSameHemisphere = (dot(wo, normal) * cosThetaI) > 0;
+    return isInSameHemisphere ? std::abs(cosThetaI) * M_INVERSE_PI : 0;
+}
+
+GFColor GLambertianMaterial::f(const GMath::vec3 &normal, const GMath::vec3 &wo, GMath::vec3 &wi) const
+{
+    return Kd * M_INVERSE_PI;
 }

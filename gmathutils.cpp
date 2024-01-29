@@ -154,6 +154,49 @@ mat4f GMathUtils::TRS(vec3f &translate, vec3f &rotation, vec3f &scale)
     return ret;
 }
 
+mat3f GMathUtils::RotationMatrix(GMath::vec3f fromV, GMath::vec3f toV)
+{
+    fromV.normalize();
+    toV.normalize();
+    float cosTheta = dot(fromV, toV);
+    mat3f ret;
+    ret.identity();
+    if(cosTheta < -1 + 0.001f)
+    {
+        ret[0][0] = -1;
+        ret[1][1] = -1;
+        ret[2][2] = -1;
+        return ret;
+    }
+
+    vec3f rotationAxis = cross(fromV, toV);
+    float s = sqrt((1+cosTheta)*2);
+    float invertS = 1/s;
+    vec4 quaternion(rotationAxis.x()*invertS, rotationAxis.y()*invertS, rotationAxis.z()*invertS, s * 0.5);
+
+    float xx = quaternion.x() * quaternion.x();
+    float xy = quaternion.x() * quaternion.y();
+    float xz = quaternion.x() * quaternion.z();
+    float xw = quaternion.x() * quaternion.w();
+    float yy = quaternion.y() * quaternion.y();
+    float yz = quaternion.y() * quaternion.z();
+    float yw = quaternion.y() * quaternion.w();
+    float zz = quaternion.z() * quaternion.z();
+    float zw = quaternion.z() * quaternion.w();
+    float ww = quaternion.w() * quaternion.w();
+
+    ret[0][0] = 1-2*yy-2*zz;
+    ret[0][1] = 2*xy+2*zw;
+    ret[0][2] = 2*xz-2*yw;
+    ret[1][0] = 2*xy-2*zw;
+    ret[1][1] = 1-2*xx-2*zz;
+    ret[1][2] = 2*yz+2*xw;
+    ret[2][0] = 2*xz+2*yw;
+    ret[2][1] = 2*yz-2*xw;
+    ret[2][2] = 1-2*xx-2*yy;
+    return ret;
+}
+
 float GMathUtils::Rad2Deg(float rad)
 {
     return rad * 180.0f / M_PI;

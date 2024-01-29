@@ -48,14 +48,14 @@ public:
 class GSphereModel : public GModel
 {
 public:
-    GSphereModel(double radius, std::shared_ptr<GMaterial> mateiral)
-        :sphere(0, radius), mateiral(mateiral)
+    GSphereModel(double radius, std::shared_ptr<GMaterial> material)
+        :sphere(0, radius), material(material)
     {}
 
     bool intersect(const GMath::GRay& ray, GMath::interval ray_t, GMath::GSurfaceInteraction& isect) override;
 private:
     GSphere sphere;
-    std::shared_ptr<GMaterial> mateiral;
+    std::shared_ptr<GMaterial> material;
 };
 
 #endif // GMODEL_H

@@ -15,7 +15,7 @@ public:
     {
     }
 
-    bool intersect(const GMath::GRay& ray, GMath::interval& ray_t, GMath::GSurfaceInteraction& isect)
+    bool intersect(const GMath::GRay& ray, GMath::interval& ray_t, GMath::GSurfaceInteraction& isect) const
     {
         for(auto model : models)
         {

@@ -42,9 +42,8 @@ public:
     vec3 wo;
     double t;
     bool isFrontFace;
-    std::shared_ptr<GMaterial> mateiral;
+    std::shared_ptr<GMaterial> material;
     std::shared_ptr<GModel> model = nullptr;
-    std::shared_ptr<GBSDF> bsdf = nullptr;
     std::shared_ptr<GLight> light = nullptr;
 
     void SetFaceNormal(const GRay& r, const vec3& outNormal)
@@ -53,7 +52,6 @@ public:
         normal = isFrontFace ? outNormal : -outNormal;
     }
 
-    void ComputeScatteringFunctions();
     GFColor Le(const GScene& scene, const vec3& w) const;
 };
 }
