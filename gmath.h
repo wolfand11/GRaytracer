@@ -252,9 +252,9 @@ GVect<T,n> proj(const GVect<T,m>& v)
 }
 
 template <typename T, int n>
-T reflect(const GVect<T,n>& v, const GVect<T,n>& normal)
+GVect<T,n> reflect(const GVect<T,n>& v, const GVect<T,n>& normal)
 {
-    return v - 2*dot(v,normal)*normal;
+    return v - normal*2*dot(v,normal);
 }
 
 template <typename T, int n>

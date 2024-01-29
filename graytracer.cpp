@@ -119,6 +119,7 @@ void GRaytracer::CreateScene()
     auto redLambertMat = std::make_shared<GLambertianMaterial>(GColor::redF);
     auto greenLambertMat = std::make_shared<GLambertianMaterial>(GColor::greenF);
     auto grayLambertMat = std::make_shared<GLambertianMaterial>(GColor::grayF);
+    auto blueMetalMat = std::make_shared<GMetalMaterial>(GColor::blueF, 0);
     {
         auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
         sphereGObj0->SetT(vec3f(0, 0.5, 1));
@@ -130,7 +131,7 @@ void GRaytracer::CreateScene()
         scene.models.push_back(sphereGObj2);
     }
     {
-        auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
+        auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, blueMetalMat);
         sphereGObj3->SetT(vec3f(1.2, 0.5, 1));
         scene.models.push_back(sphereGObj3);
     }

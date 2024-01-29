@@ -10,7 +10,7 @@ public:
     virtual ~GMaterial() = default;
     virtual GFColor Sample_f(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi, float& pdf) const;
     virtual GFColor f(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi) const = 0;
-    virtual float Pdf(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi) const;
+    virtual float Pdf(const GMath::vec3& normal, const GMath::vec3& wo, const GMath::vec3& wi) const;
 
     virtual bool IsSpecular() { return false; }
 };
@@ -37,6 +37,8 @@ public:
     {}
 
     GFColor Sample_f(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi, float& pdf) const;
+    GFColor f(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi) const;
+    float Pdf(const GMath::vec3& normal, const GMath::vec3& wo, const GMath::vec3& wi) const;
     bool IsSpecular() override;
 private:
     GFColor Ks;
