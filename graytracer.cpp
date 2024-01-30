@@ -102,11 +102,16 @@ void GRaytracer::CreateScene()
     {
         auto lightGObj = std::make_shared<GDirectionalLight>();
         lightGObj->SetR(vec3f(50,0,0));
-        scene.lights.push_back(lightGObj);
+        //scene.lights.push_back(lightGObj);
     }
     {
         auto skyLightGObj = std::make_shared<GSkyLight>();
         scene.lights.push_back(skyLightGObj);
+    }
+    {
+        auto sphereLight = std::make_shared<GSphereLight>(1);
+        sphereLight->SetT(vec3f(0, 2, 1));
+        scene.lights.push_back(sphereLight);
     }
 
     // camera
@@ -116,24 +121,34 @@ void GRaytracer::CreateScene()
     scene.camera = cameraGObj;
 
     // models
+    auto redTex = std::make_shared<GSolidColor>(GColor::redF);
+    auto lightGrayTex = std::make_shared<GSolidColor>(GColor::grayF*1.5);
+    auto goldTex = std::make_shared<GSolidColor>(GFColor(1.0, 0.782, 0.344, 1));
+    auto ironTex = std::make_shared<GSolidColor>(GFColor(0.562, 0.565, 0.578, 1));
+    auto roughTex = std::make_shared<GSolidColor>(GFColor(0.1, 0., 0., 1));
     auto redLambertMat = std::make_shared<GLambertianMaterial>(GColor::redF);
     auto greenLambertMat = std::make_shared<GLambertianMaterial>(GColor::greenF);
     auto grayLambertMat = std::make_shared<GLambertianMaterial>(GColor::grayF);
-    auto blueMetalMat = std::make_shared<GMetalMaterial>(GColor::blueF, 0);
+    auto lightGrayMetalMat = std::make_shared<GSpecularMaterial>(lightGrayTex);
+    auto goldSpecMat = std::make_shared<GSpecularMaterial>(goldTex);
+    auto goldGlossyMat = std::make_shared<GGlossyMaterial>(goldTex, roughTex);
+    auto ironSpecMat = std::make_shared<GSpecularMaterial>(ironTex);
     {
         auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
         sphereGObj0->SetT(vec3f(0, 0.5, 1));
-        scene.models.push_back(sphereGObj0);
+        //scene.models.push_back(sphereGObj0);
     }
     {
-        auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
+        //auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
+        auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, ironSpecMat);
         sphereGObj2->SetT(vec3f(-1.2, 0.5, 1));
         scene.models.push_back(sphereGObj2);
     }
     {
-        auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, blueMetalMat);
+        //auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldSpecMat);
+        auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldGlossyMat);
         sphereGObj3->SetT(vec3f(1.2, 0.5, 1));
-        scene.models.push_back(sphereGObj3);
+        //scene.models.push_back(sphereGObj3);
     }
     {
         auto sphereGObj1 = std::make_shared<GSphereModel>(100, grayLambertMat);

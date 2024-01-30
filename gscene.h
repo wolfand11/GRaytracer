@@ -17,6 +17,13 @@ public:
 
     bool intersect(const GMath::GRay& ray, GMath::interval& ray_t, GMath::GSurfaceInteraction& isect) const
     {
+        for(auto light : lights)
+        {
+            if(light->intersect(ray, ray_t, isect))
+            {
+                return true;
+            }
+        }
         for(auto model : models)
         {
             if(model->intersect(ray, ray_t, isect))

@@ -22,9 +22,9 @@ public:
     void SetS(GMath::vec3f scale);
     void SetTRS(GMath::vec3f pos,GMath::vec3f rotation,GMath::vec3f scale);
     void TRSInvertTRS(const GMath::mat4f*& trs, const GMath::mat4f*& invertTRS);
-    const GMath::vec3f& position() { return _position; }
-    const GMath::vec3f& rotation() { return _rotation; }
-    const GMath::vec3f& scale() { return _scale; }
+    const GMath::vec3f& position()const { return _position; }
+    const GMath::vec3f& rotation()const { return _rotation; }
+    const GMath::vec3f& scale()const { return _scale; }
 
     GGameObjectType mtype;
     GMath::vec3f right();

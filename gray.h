@@ -40,6 +40,8 @@ public:
     vec3 p;
     vec3 normal;
     vec3 wo;
+    vec3 wi;
+    vec2 uv;
     double t;
     bool isFrontFace;
     std::shared_ptr<GMaterial> material;

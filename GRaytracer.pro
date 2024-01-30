@@ -38,6 +38,7 @@ SOURCES += \
         gray.cpp \
         graytracer.cpp \
         gsampler.cpp \
+        gtexture.cpp \
         gutils.cpp \
         main.cpp \
         tgaimage.cpp
@@ -59,6 +60,7 @@ HEADERS += \
         graytracer.h \
         gsampler.h \
         gscene.h \
+        gtexture.h \
         gutils.h \
         tgaimage.h
 

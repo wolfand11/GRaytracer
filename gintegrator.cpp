@@ -20,7 +20,7 @@ void GIntegrator::Render(GScene &scene)
             }
             L = L / spp;
             L.SetW(1);
-            //GColor::FastTonemap(L);
+            L = GColor::FastTonemap(L);
             scene.film.SetColor(i,j, GColor::FromFloat01Color(L));
         }
     }
@@ -64,24 +64,23 @@ GFColor GIntegrator::Li(GMath::GRay &ray, GScene &scene, int depth)
             continue;
         }
 
-        // direct light
         if(!isect.material->IsSpecular())
         {
+            // direct light shading
             GFColor Ld = SampleLight(scene, isect);
-            // add direct light
             L = L + beta * Ld;
         }
 
-        vec3 wo = -ray.dir;
-        vec3 wi;
+        // process ray recursive
+        isect.wo = -ray.dir;
         float pdf;
-        GFColor f = isect.material->Sample_f(isect.normal, wo, wi, pdf);
+        GFColor f = isect.material->Sample_f(isect, pdf);
         if(GColor::IsBlack(f) || pdf==0.f) break;
 
-        beta = beta * f * absDot(wi, isect.normal) / pdf;
+        beta = beta * f * absDot(isect.wi, isect.normal) / pdf;
         specularBounce = isect.material->IsSpecular();
         ray.origin = isect.p;
-        ray.dir = wi;
+        ray.dir = isect.wi;
 
         GFColor rrBeta = beta;
         if(rrBeta.max() < rrThreshold && bounces > 3)
@@ -94,19 +93,20 @@ GFColor GIntegrator::Li(GMath::GRay &ray, GScene &scene, int depth)
     return L;
 }
 
-//
+// Tips: don't return beta.
 // GFColor GIntegrator::SampleLight(const GScene &scene, const GMath::GSurfaceInteraction &isect, GFColor& beta)
-GFColor GIntegrator::SampleLight(const GScene &scene, const GMath::GSurfaceInteraction &isect)
+GFColor GIntegrator::SampleLight(const GScene &scene, GMath::GSurfaceInteraction &isect)
 {
     GFColor Ld = GColor::blackF;
     for(auto light : scene.lights)
     {
         vec3 wi;
         float lightPdf;
-        GFColor Li = light->Sample_Li(scene, isect, wi, &lightPdf);
+        GFColor Li = light->Sample_Li(scene, isect, wi, lightPdf);
         if(GColor::IsBlack(Li) || lightPdf == 0) continue;
-        GFColor f = isect.material->f(isect.normal, isect.wo, wi) * absDot(wi, isect.normal);
-        float scatteringPdf = isect.material->Pdf(isect.normal, isect.wo, wi);
+        isect.wi = wi;
+        GFColor f = isect.material->f(isect) * absDot(wi, isect.normal);
+        float scatteringPdf = isect.material->Pdf(isect);
         if(!GColor::IsBlack(f))
         {
             Ld = Ld + Li * f / lightPdf;

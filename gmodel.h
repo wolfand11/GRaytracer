@@ -23,6 +23,8 @@ public:
     GShape()=default;
     ~GShape(){}
     virtual bool intersect(const GMath::GRay& ray, GMath::interval intervalV, GMath::GSurfaceInteraction& isect) = 0;
+    virtual GMath::GSurfaceInteraction Sample(const GGameObject& owner, float& pdf) const = 0;
+    virtual GMath::GSurfaceInteraction Sample(const GGameObject& owner, const GMath::GSurfaceInteraction& ref, float& pdf) const = 0;
 };
 
 class GSphere : public GShape
@@ -33,6 +35,8 @@ public:
     {}
 
     bool intersect(const GMath::GRay& ray, GMath::interval ray_t, GMath::GSurfaceInteraction& isect) override;
+    GMath::GSurfaceInteraction Sample(const GGameObject& owner, float& pdf) const override;
+    GMath::GSurfaceInteraction Sample(const GGameObject& owner, const GMath::GSurfaceInteraction& ref, float& pdf) const override;
 
     vec3 center;
     double radius;
@@ -43,6 +47,8 @@ class GModel : public GGameObject
 public:
     GModel();
     virtual bool intersect(const GMath::GRay& ray, GMath::interval intervalV, GMath::GSurfaceInteraction& isect) = 0;
+
+protected:
 };
 
 class GSphereModel : public GModel

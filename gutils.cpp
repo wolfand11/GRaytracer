@@ -17,7 +17,7 @@ float GUtils::screenAspectRatio()
 
 std::string GUtils::GetProjRootPath()
 {
-    QDir dir(QCoreApplication::applicationDirPath()+"/../../GRaster");
+    QDir dir(QCoreApplication::applicationDirPath()+"/../../GRaytracer");
     if(dir.exists())
     {
         return dir.absolutePath().toStdString();
@@ -48,7 +48,7 @@ bool GUtils::IsFileExist(const std::string filepath)
 }
 
 
-GColor GUtils::SampleImage(TGAImage *img, GMath::vec2 uv, GTextureWrapMode wrapMode, GColor defaultColor)
+GColor GUtils::SampleImage(const TGAImage *img, GMath::vec2 uv, GTextureWrapMode wrapMode, GColor defaultColor)
 {
     if(img->get_width()<1 || img->get_height()<1)
     {
@@ -109,7 +109,7 @@ GColor GUtils::SampleImage(TGAImage *img, GMath::vec2 uv, GTextureWrapMode wrapM
     return ret;
 }
 
-GColor GUtils::SampleImage(std::vector<TGAImage> *mipmaps, GMath::vec2 uv, int mipmapLevel, GTextureWrapMode wrapMode, GColor defaultColor)
+GColor GUtils::SampleImage(const std::vector<TGAImage> *mipmaps, GMath::vec2 uv, int mipmapLevel, GTextureWrapMode wrapMode, GColor defaultColor)
 {
     if(mipmaps==nullptr)
     {

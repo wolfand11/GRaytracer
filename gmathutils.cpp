@@ -10,6 +10,19 @@ int GMathUtils::FloatNegativOneToOne2Int32(float src)
     return (int)(src*(double)INT_MAX);
 }
 
+void GMathUtils::CoordinateSystem(const GMath::vec3 &v0, GMath::vec3 &v1, GMath::vec3 &v2)
+{
+    if(std::abs(v0.x()) > std::abs(v0.y()))
+    {
+        v1 = vec3(-v0.z(), 0, v0.x()).normalize();
+    }
+    else
+    {
+        v1 = vec3(0, v0.z(), -v0.y()).normalize();
+    }
+    v2 = cross(v0, v1);
+}
+
 GMath::mat4 GMathUtils::LookAt(GMath::vec3 eyePos, GMath::vec3 lookAtPoint, GMath::vec3 up)
 {
     mat4 ret;
@@ -194,7 +207,7 @@ mat3f GMathUtils::RotationMatrix(GMath::vec3f fromV, GMath::vec3f toV)
     ret[2][0] = 2*xz+2*yw;
     ret[2][1] = 2*yz-2*xw;
     ret[2][2] = 1-2*xx-2*yy;
-    return ret;
+    return ret.transpose();
 }
 
 float GMathUtils::Rad2Deg(float rad)

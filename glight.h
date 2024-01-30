@@ -29,7 +29,7 @@ public:
         return GColor::blackF;
     }
     virtual GFColor Le(const GScene& scene, const GMath::GSurfaceInteraction& isect, const GMath::vec3& w);
-    virtual GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float* pdf);
+    virtual GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf);
 
     GFColor lightColor;
     GLightType lightType;
@@ -43,7 +43,7 @@ public:
     {
     }
 
-    GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float* pdf) override;
+    GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
 };
 
 class GPointLight: public GLight
@@ -54,7 +54,7 @@ public:
     {
     }
 
-    GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float* pdf) override;
+    GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
 };
 
 
@@ -71,12 +71,13 @@ public:
 class GDiffuseAreaLight : public GLight
 {
 public:
-    GDiffuseAreaLight(std::shared_ptr<GShape> shape, bool twoSided=true, GFColor lColor=GColor::whiteF)
+    GDiffuseAreaLight(std::shared_ptr<GShape> shape, GFColor lColor=GColor::whiteF, bool twoSided=true)
         :GLight(GLightType::kLTDiffuseArea, lColor),twoSided(twoSided),shape(shape)
     {
     }
 
     GFColor Le(const GScene& scene, const GMath::GSurfaceInteraction& isect, const GMath::vec3& w) override;
+    GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
 
     bool twoSided;
     std::shared_ptr<GShape> shape;
@@ -85,8 +86,8 @@ public:
 class GSphereLight : public GDiffuseAreaLight
 {
 public:
-    GSphereLight(double radius, bool twoSided=true, GFColor lColor=GColor::whiteF)
-        :GDiffuseAreaLight(std::make_shared<GSphere>(0, radius),twoSided, lColor)
+    GSphereLight(double radius, GFColor lColor=GColor::whiteF, bool twoSided=true)
+        :GDiffuseAreaLight(std::make_shared<GSphere>(0, radius), lColor, twoSided)
     {
     }
 

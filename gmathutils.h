@@ -16,6 +16,7 @@ public:
     }
 
     // vec helper
+    static void CoordinateSystem(const GMath::vec3& v0, GMath::vec3& v1, GMath::vec3& v2);
 
     // matrix helper
     static GMath::mat4 LookAt(GMath::vec3 eyePos, GMath::vec3 lookAtPoint, GMath::vec3 up);

@@ -218,7 +218,7 @@ void TGAImage::set(int x, int y, const TGAColor &c) {
     memcpy(data.data()+(x+y*width)*bytespp, c.bgra, bytespp);
 }
 
-int TGAImage::get_bytespp() {
+int TGAImage::get_bytespp() const {
     return bytespp;
 }
 

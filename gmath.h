@@ -152,6 +152,42 @@ GVect<T,n> operator-(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
     return ret;
 }
 
+
+
+template <typename T, int n>
+GVect<T,n> operator*(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
+{
+    GVect<T,n> ret = lhs;
+    for(int i=0; i<n; i++)
+    {
+        ret[i] *= rhs[i];
+    }
+    return ret;
+}
+
+template <typename T, int n>
+GVect<T,n> operator/(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
+{
+    GVect<T,n> ret = lhs;
+    for(int i=0; i<n; i++)
+    {
+        ret[i] /= rhs[i];
+    }
+    return ret;
+}
+
+
+template <typename T, int n>
+T dot(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
+{
+    T ret = 0;
+    for(int i=0; i<n; i++)
+    {
+        ret += lhs[i]*rhs[i];
+    }
+    return ret;
+}
+
 /* conflict with matrix multiply
 template <typename T, typename ST, int n>
 GVect<T,n> operator*(const ST& lhs, const GVect<T,n>& rhs)
@@ -188,40 +224,6 @@ GVect<T,n> operator/(const GVect<T,n>& lhs, const ST& rhs)
 }
 
 template <typename T, int n>
-GVect<T,n> operator*(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
-{
-    GVect<T,n> ret = lhs;
-    for(int i=0; i<n; i++)
-    {
-        ret[i] *= rhs[i];
-    }
-    return ret;
-}
-
-template <typename T, int n>
-GVect<T,n> operator/(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
-{
-    GVect<T,n> ret = lhs;
-    for(int i=0; i<n; i++)
-    {
-        ret[i] /= rhs[i];
-    }
-    return ret;
-}
-
-
-template <typename T, int n>
-T dot(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
-{
-    T ret = 0;
-    for(int i=0; i<n; i++)
-    {
-        ret += lhs[i]*rhs[i];
-    }
-    return ret;
-}
-
-template <typename T, int n>
 T absDot(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
 {
     return std::abs(dot(lhs, rhs));
@@ -252,9 +254,11 @@ GVect<T,n> proj(const GVect<T,m>& v)
 }
 
 template <typename T, int n>
-GVect<T,n> reflect(const GVect<T,n>& v, const GVect<T,n>& normal)
+GVect<T,n> reflect(const GVect<T,n>& v, const GVect<T,n>& normal, bool normalize=true)
 {
-    return v - normal*2*dot(v,normal);
+    auto ret = normal*2*dot(v,normal) - v;
+    if(normalize) return ret.normalize();
+    return ret;
 }
 
 template <typename T, int n>
