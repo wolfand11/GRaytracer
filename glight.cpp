@@ -24,7 +24,7 @@ GFColor GDirectionalLight::Sample_Li(const GScene& scene, const GMath::GSurfaceI
     pdf = 1;
     vec3 pOutside = isect.p + wi * GUtils::worldSize;
     vec3 rayDir = pOutside - isect.p;
-    interval ray_t(0.001, rayDir.length());
+    interval ray_t(0.001, rayDir.length()*0.999);
     GRay shadowRay(isect.p, rayDir.normalize());
     GSurfaceInteraction newIsect;
     if(!scene.intersect(shadowRay, ray_t, newIsect))
@@ -37,7 +37,7 @@ GFColor GDirectionalLight::Sample_Li(const GScene& scene, const GMath::GSurfaceI
 GFColor GPointLight::Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction &isect, vec3 &wi, float& pdf)
 {
     vec3 rayDir = (vec3)_position - isect.p;
-    interval ray_t(0.001, rayDir.length());
+    interval ray_t(0.001, rayDir.length()*0.999);
     wi = rayDir;
     wi.normalize();
     pdf = 1;
@@ -85,11 +85,11 @@ GFColor GDiffuseAreaLight::Sample_Li(const GScene &scene, const GMath::GSurfaceI
         pdf = 0;
         return GColor::blackF;
     }
-    interval ray_t(0.001, rayDir.length());
+    interval ray_t(0.001, rayDir.length()*0.999);
     wi = rayDir.normalize();
     GRay shadowRay(isect.p, wi);
     GSurfaceInteraction newIsect;
-    if(!scene.intersect(shadowRay, ray_t, newIsect))
+    if(!scene.intersect(shadowRay, ray_t, newIsect) || newIsect.light.get()==this)
     {
         return Le(scene, newIsect, -wi);
     }
@@ -103,7 +103,6 @@ bool GSphereLight::intersect(const GMath::GRay &ray, GMath::interval ray_t, GMat
     sphere->center = _position;
     if(sphere->intersect(ray, ray_t, isect))
     {
-        //isect.material = material;
         return true;
     }
     return false;

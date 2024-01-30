@@ -21,6 +21,8 @@ public:
         {
             if(light->intersect(ray, ray_t, isect))
             {
+                isect.model = nullptr;
+                isect.light = light;
                 return true;
             }
         }
@@ -28,6 +30,8 @@ public:
         {
             if(model->intersect(ray, ray_t, isect))
             {
+                isect.light = nullptr;
+                isect.model = model;
                 return true;
             }
         }

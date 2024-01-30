@@ -109,8 +109,8 @@ void GRaytracer::CreateScene()
         scene.lights.push_back(skyLightGObj);
     }
     {
-        auto sphereLight = std::make_shared<GSphereLight>(1);
-        sphereLight->SetT(vec3f(0, 2, 1));
+        auto sphereLight = std::make_shared<GSphereLight>(0.25, GColor::whiteF*100);
+        sphereLight->SetT(vec3f(-1.4, 2.5, 1));
         scene.lights.push_back(sphereLight);
     }
 
@@ -136,7 +136,7 @@ void GRaytracer::CreateScene()
     {
         auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
         sphereGObj0->SetT(vec3f(0, 0.5, 1));
-        //scene.models.push_back(sphereGObj0);
+        scene.models.push_back(sphereGObj0);
     }
     {
         //auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
@@ -148,7 +148,7 @@ void GRaytracer::CreateScene()
         //auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldSpecMat);
         auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldGlossyMat);
         sphereGObj3->SetT(vec3f(1.2, 0.5, 1));
-        //scene.models.push_back(sphereGObj3);
+        scene.models.push_back(sphereGObj3);
     }
     {
         auto sphereGObj1 = std::make_shared<GSphereModel>(100, grayLambertMat);

@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>GRaster</string>
+   <string>GRaytracer</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">

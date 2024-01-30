@@ -41,13 +41,14 @@ GFColor GIntegrator::Li(GMath::GRay &ray, GScene &scene, int depth)
         {
             if(hited)
             {
+                // emitted lights(e.g:area light) at path
                 L = L + beta * isect.Le(scene, -ray.dir);
             }
             else
             {
                 for(auto light : scene.lights)
                 {
-                    // infinite lights
+                    // infinite lights at path
                     if(light->lightType==GLightType::kLTSky)
                     {
                         L = L + beta * light->Le(ray);
