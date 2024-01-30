@@ -13,3 +13,4 @@
 
 * ScreenShot
   [[./01_area-light.jpg]]
+  [[./02_path-integrator.jpg]]
