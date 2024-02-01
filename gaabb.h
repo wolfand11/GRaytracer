@@ -24,6 +24,13 @@ public:
         z = GInterval<T>(std::fmin(a[2], b[2]), std::fmax(a[2], b[2]));
     }
 
+    GAABB(const GVect<T,3>& a, const GVect<T,3>& b, const GVect<T,3>& c)
+    {
+        x = GInterval<T>(std::fmin(a[0], b[0], c[0]), std::fmax(a[0], b[0], c[0]));
+        y = GInterval<T>(std::fmin(a[1], b[1], c[1]), std::fmax(a[1], b[1], c[1]));
+        z = GInterval<T>(std::fmin(a[2], b[2], c[2]), std::fmax(a[2], b[2], c[2]));
+    }
+
     GAABB(const GAABB<T>& box0, const GAABB<T>& box1)
     {
         x = GInterval<T>(box0.x, box1.x);

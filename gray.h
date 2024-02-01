@@ -11,6 +11,7 @@ class GMaterial;
 class GBSDF;
 class GLight;
 class GScene;
+class GGameObject;
 
 namespace GMath
 {
@@ -73,7 +74,7 @@ public:
 
     virtual GMath::GAABB<double> bBox() const = 0;
 
-    void* owner;
+    GGameObject* owner;
 };
 
 #endif // GRAY_H

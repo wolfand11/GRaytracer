@@ -95,6 +95,12 @@ struct GVect
         data[1] = y;
         data[2] = z;
     }
+    void SetXYZ(GVect<T, 3> xyz)
+    {
+        data[0] = xyz[0];
+        data[1] = xyz[1];
+        data[2] = xyz[2];
+    }
 
     T max()
     {

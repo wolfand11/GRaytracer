@@ -11,14 +11,14 @@ using namespace std;
 
 GSurfaceInteraction GShapeList::Sample(const GGameObject &owner, float &pdf, double time) const
 {
-    GSurfaceInteraction ret;
-    return ret;
+    GSurfaceInteraction intr;
+    return intr;
 }
 
 GSurfaceInteraction GShapeList::Sample(const GGameObject &owner, const GSurfaceInteraction &ref, float &pdf) const
 {
-    GSurfaceInteraction ret;
-    return ret;
+    GSurfaceInteraction intr;
+    return intr;
 }
 
 bool GShapeList::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &isect)
