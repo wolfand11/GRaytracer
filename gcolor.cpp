@@ -1,5 +1,6 @@
 #include "gcolor.h"
 #include "glog.h"
+#include "gsampler.h"
 using namespace std;
 using namespace GMath;
 
@@ -51,5 +52,16 @@ GFColor GColor::Lerp(GFColor color1, GFColor color2, float f)
     ret.SetY(color1.y() * f + color2.y() * (1-f));
     ret.SetZ(color1.z() * f + color2.z() * (1-f));
     ret.SetW(color1.w() * f + color2.w() * (1-f));
+    return ret;
+}
+
+GColor GColor::Random(bool randomAlpha)
+{
+    return FromFloat01Color(RandomF(randomAlpha));
+}
+
+GFColor GColor::RandomF(bool randomAlpha)
+{
+    GFColor ret(GSampler::Random(), GSampler::Random(), GSampler::Random(), randomAlpha?GSampler::Random():1);
     return ret;
 }

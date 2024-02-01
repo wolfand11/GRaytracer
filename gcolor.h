@@ -137,6 +137,9 @@ struct GColor
     {
         return color.x()==0 && color.y()==0 && color.z()==0;
     }
+
+    static GColor Random(bool randomAlpha = false);
+    static GFColor RandomF(bool randomAlpha = false);
 };
 
 struct GHDRColor

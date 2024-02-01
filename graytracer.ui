@@ -445,6 +445,26 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="lenRLabel">
+            <property name="text">
+             <string>Len R</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lenREdit"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="focalDisLabel">
+            <property name="text">
+             <string>Focal Dis</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="focalDisEdit"/>
+          </item>
+          <item>
            <widget class="QLabel" name="sppLabel">
             <property name="text">
              <string>SPP</string>

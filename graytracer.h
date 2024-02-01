@@ -30,6 +30,8 @@ protected:
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     void CreateScene();
+    void CreateTestScene();
+    void CreateMultiObjScene();
     void SetupGRaytracer();
     void RefreshUI();
     void OnPreDraw();

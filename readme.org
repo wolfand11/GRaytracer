@@ -5,12 +5,19 @@
   - 画布原点在左上角，最终显示时做了上下颠倒
 
 * 特性说明
-  - 支持 Lambertian Material
-  - 支持 Specular Material
-  - 支持 PBR Glossy Material
-  - 支持 方向光
-  - 支持 AreaLight
-
+  - 支持 Thin Lens Camera
+  - 支持多种 Material
+    - 支持 Lambertian Material
+    - 支持 Specular Material
+    - 支持 PBR Glossy Material
+  - 支持多种光源
+    - 支持简单的 SkyLight
+    - 支持 方向光
+    - 支持 AreaLight
+  - 支持 PathTracing Integrator
+    - 支持 BVH 加速
+    - 支持重要性采样
+    - 支持使用 Russian roulette 来截断 Path
+    [[./02_path-integrator.jpg]]
 * ScreenShot
   [[./01_area-light.jpg]]
-  [[./02_path-integrator.jpg]]

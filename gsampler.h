@@ -18,6 +18,10 @@ public:
     {
         return min + (max-min)*Random();
     }
+    static inline int RandomInt(int min, int max)
+    {
+        return static_cast<int>(Random(min, max+1));
+    }
 
     static inline vec3 RandomVec3()
     {

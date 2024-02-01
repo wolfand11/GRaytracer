@@ -6,6 +6,7 @@
 #include "gmodel.h"
 #include "gbuffer.h"
 #include "glight.h"
+#include "gbvh.h"
 
 class GScene
 {
@@ -15,34 +16,83 @@ public:
     {
     }
 
-    bool intersect(const GMath::GRay& ray, GMath::interval& ray_t, GMath::GSurfaceInteraction& isect) const
+    bool intersect(const GRay& ray, GMath::interval& ray_t, GSurfaceInteraction& isect) const
     {
-        for(auto light : lights)
+        if(bvhTree!=nullptr)
         {
-            if(light->intersect(ray, ray_t, isect))
+            if(bvhTree->intersect(ray, ray_t, isect))
             {
-                isect.model = nullptr;
-                isect.light = light;
+                ray_t.max = isect.t;
                 return true;
             }
+            return false;
         }
-        for(auto model : models)
+        else
         {
-            if(model->intersect(ray, ray_t, isect))
+            bool hitAny = false;
+            for(auto light : lights)
             {
-                isect.light = nullptr;
-                isect.model = model;
-                return true;
+                if(light->intersect(ray, ray_t, isect))
+                {
+                    ray_t.max = isect.t;
+                    hitAny = true;
+                }
+            }
+            for(auto model : models)
+            {
+                if(model->intersect(ray, ray_t, isect))
+                {
+                    ray_t.max = isect.t;
+                    hitAny = true;
+                }
+            }
+            return hitAny;
+        }
+    }
+
+    void add(std::shared_ptr<GGameObject> gObj)
+    {
+        if(gObj->mtype == GGameObject::kModel)
+        {
+            auto model = std::dynamic_pointer_cast<GModel>(gObj);
+            models.push_back(model);
+            bbox = aabb(bbox, model->bBox());
+            hittables.push_back(model);
+        }
+        else if(gObj->mtype == GGameObject::kLight)
+        {
+            auto light = std::dynamic_pointer_cast<GLight>(gObj);
+            lights.push_back(std::dynamic_pointer_cast<GLight>(gObj));
+
+            if(light->lightType == GLightType::kLTDiffuseArea)
+            {
+
+                auto light = std::dynamic_pointer_cast<GDiffuseAreaLight>(gObj);
+                bbox = aabb(bbox, light->bBox());
+                hittables.push_back(light);
             }
         }
-        return false;
+    }
+
+    aabb bBox() const
+    {
+        return bbox;
+    }
+
+    void BuildBVHTree()
+    {
+        bvhTree = make_shared<GBVHNode>(hittables, 0, hittables.size());
     }
 
     std::shared_ptr<GCamera> camera;
+    GColorBuffer film;
     std::vector<std::shared_ptr<GModel>> models;
     std::vector<std::shared_ptr<GLight>> lights;
+    std::vector<std::shared_ptr<GHittable>> hittables;
 
-    GColorBuffer film;
+private:
+    std::shared_ptr<GBVHNode> bvhTree;
+    GMath::aabb bbox;
 };
 
 #endif // GSCENE_H

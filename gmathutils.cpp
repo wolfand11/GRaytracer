@@ -237,23 +237,3 @@ vec3f GMathUtils::Deg2Rad(vec3f degree)
     angle[3] = Deg2Rad(degree[2]);
     return angle;
 }
-
-bool GMathUtils::intersect(const GMath::GRay &r, GMath::interval ray_t, const GMath::aabb &bbox)
-{
-    for(int i=0; i<3; i++)
-    {
-        auto invD = 1/r.dir[i];
-        auto origin = r.origin[i];
-
-        auto t0 = (bbox.axis(i).min - origin) * invD;
-        auto t1 = (bbox.axis(i).max - origin) * invD;
-
-        if(invD < 0) std::swap(t0, t1);
-
-        if(t0 > ray_t.min) ray_t.min = t0;
-        if(t1 < ray_t.max) ray_t.max = t1;
-
-        if(ray_t.max <= ray_t.min) return false;
-    }
-    return true;
-}

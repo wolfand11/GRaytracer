@@ -4,6 +4,8 @@
 #include "gmath.h"
 #include "gcolor.h"
 
+using namespace GMath;
+
 class GModel;
 class GMaterial;
 class GBSDF;
@@ -12,16 +14,20 @@ class GScene;
 
 namespace GMath
 {
+template <typename T> struct GAABB;
+}
+
 struct GRay
 {
 public:
-    GRay(): origin(0,0,0),dir(0,0,0) {};
-    GRay(vec3 origin, vec3 dir);
+    GRay(): origin(0,0,0),dir(0,0,0),time(0) {};
+    GRay(vec3 origin, vec3 dir, double time=0);
 
     vec3 GetPos(float t) const;
 
     vec3 origin;
     vec3 dir;
+    double time;
 };
 
 struct GRayDifferential
@@ -43,10 +49,11 @@ public:
     vec3 wi;
     vec2 uv;
     double t;
+    double time = 0;
     bool isFrontFace;
-    std::shared_ptr<GMaterial> material;
-    std::shared_ptr<GModel> model = nullptr;
-    std::shared_ptr<GLight> light = nullptr;
+    GMaterial* material = nullptr;
+    GModel* model = nullptr;
+    GLight* light = nullptr;
 
     void SetFaceNormal(const GRay& r, const vec3& outNormal)
     {
@@ -56,6 +63,17 @@ public:
 
     GFColor Le(const GScene& scene, const vec3& w) const;
 };
-}
+
+class GHittable
+{
+public:
+    virtual ~GHittable() = default;
+
+    virtual bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) = 0;
+
+    virtual GMath::GAABB<double> bBox() const = 0;
+
+    void* owner;
+};
 
 #endif // GRAY_H

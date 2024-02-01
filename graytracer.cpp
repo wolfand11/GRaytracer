@@ -8,6 +8,7 @@
 #include <QDoubleValidator>
 #include "gmaterial.h"
 #include "glight.h"
+#include "gsampler.h"
 using namespace GMath;
 
 static void CopyColorBufferToImage(GColorBuffer* colorBuffer, QImage* image)
@@ -57,6 +58,8 @@ GRaytracer::GRaytracer(QWidget *parent) :
     ui->rotationYLineEdit->setValidator(new QDoubleValidator(this));
     ui->rotationZLineEdit->setValidator(new QDoubleValidator(this));
     ui->fovLineEdit->setValidator(new QDoubleValidator(this));
+    ui->focalDisEdit->setValidator(new QDoubleValidator(this));
+    ui->lenREdit->setValidator(new QDoubleValidator(this));
     ui->sppEdit->setValidator(new QDoubleValidator(this));
     ui->depthLineEdit->setValidator(new QDoubleValidator(this));
     RefreshUI();
@@ -67,6 +70,8 @@ GRaytracer::GRaytracer(QWidget *parent) :
     connect(ui->rotationYLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
     connect(ui->rotationZLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
     connect(ui->fovLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
+    connect(ui->focalDisEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
+    connect(ui->lenREdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
     connect(ui->sppEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
     connect(ui->depthLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(on_drawProp_changed()));
 }
@@ -102,16 +107,15 @@ void GRaytracer::CreateScene()
     {
         auto lightGObj = std::make_shared<GDirectionalLight>();
         lightGObj->SetR(vec3f(50,0,0));
-        //scene.lights.push_back(lightGObj);
     }
     {
         auto skyLightGObj = std::make_shared<GSkyLight>();
-        scene.lights.push_back(skyLightGObj);
+        scene.add(skyLightGObj);
     }
     {
         auto sphereLight = std::make_shared<GSphereLight>(0.25, GColor::whiteF*100);
         sphereLight->SetT(vec3f(-1.4, 2.5, 1));
-        scene.lights.push_back(sphereLight);
+        scene.add(sphereLight);
     }
 
     // camera
@@ -120,15 +124,23 @@ void GRaytracer::CreateScene()
     cameraGObj->SetViewport(0, 0, GUtils::screenWidth, GUtils::screenHeight);
     scene.camera = cameraGObj;
 
+    CreateTestScene();
+    //CreateMultiObjScene();
+}
+
+void GRaytracer::CreateTestScene()
+{
     // models
     auto redTex = std::make_shared<GSolidColor>(GColor::redF);
     auto lightGrayTex = std::make_shared<GSolidColor>(GColor::grayF*1.5);
     auto goldTex = std::make_shared<GSolidColor>(GFColor(1.0, 0.782, 0.344, 1));
     auto ironTex = std::make_shared<GSolidColor>(GFColor(0.562, 0.565, 0.578, 1));
     auto roughTex = std::make_shared<GSolidColor>(GFColor(0.1, 0., 0., 1));
+    auto checkerTex = std::make_shared<GCheckerTexture>(0.8, GColor::whiteF, GColor::blueF);
     auto redLambertMat = std::make_shared<GLambertianMaterial>(GColor::redF);
     auto greenLambertMat = std::make_shared<GLambertianMaterial>(GColor::greenF);
     auto grayLambertMat = std::make_shared<GLambertianMaterial>(GColor::grayF);
+    auto checkerLambertMat = std::make_shared<GLambertianMaterial>(checkerTex);
     auto lightGrayMetalMat = std::make_shared<GSpecularMaterial>(lightGrayTex);
     auto goldSpecMat = std::make_shared<GSpecularMaterial>(goldTex);
     auto goldGlossyMat = std::make_shared<GGlossyMaterial>(goldTex, roughTex);
@@ -136,26 +148,112 @@ void GRaytracer::CreateScene()
     {
         auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
         sphereGObj0->SetT(vec3f(0, 0.5, 1));
-        scene.models.push_back(sphereGObj0);
+        scene.add(sphereGObj0);
     }
     {
         //auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
-        auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, ironSpecMat);
+        auto sphereGObj2 = std::make_shared<GSphereModel>(vec3(0, 0.5, 0), 0.5, ironSpecMat);
         sphereGObj2->SetT(vec3f(-1.2, 0.5, 1));
-        scene.models.push_back(sphereGObj2);
+        scene.add(sphereGObj2);
+    }
+    {
+        //auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
+        auto sphereGObj2 = std::make_shared<GSphereModel>(0.2, ironSpecMat);
+        sphereGObj2->SetT(vec3f(-2.5, 0.2, 1));
+        scene.add(sphereGObj2);
     }
     {
         //auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldSpecMat);
         auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldGlossyMat);
         sphereGObj3->SetT(vec3f(1.2, 0.5, 1));
-        scene.models.push_back(sphereGObj3);
+        scene.add(sphereGObj3);
     }
     {
-        auto sphereGObj1 = std::make_shared<GSphereModel>(100, grayLambertMat);
+        auto sphereGObj1 = std::make_shared<GSphereModel>(100, checkerLambertMat);
         //auto sphereGObj1 = std::make_shared<GSphereModel>(100, redLambertMat);
         sphereGObj1->SetT(vec3f(0, -100, 1));
-        scene.models.push_back(sphereGObj1);
+        scene.add(sphereGObj1);
     }
+    scene.BuildBVHTree();
+}
+
+void GRaytracer::CreateMultiObjScene()
+{
+    scene.camera->focalDistance = 6;
+    // models
+    auto redTex = std::make_shared<GSolidColor>(GColor::redF);
+    auto lightGrayTex = std::make_shared<GSolidColor>(GColor::grayF*1.5);
+    auto goldTex = std::make_shared<GSolidColor>(GFColor(1.0, 0.782, 0.344, 1));
+    auto ironTex = std::make_shared<GSolidColor>(GFColor(0.562, 0.565, 0.578, 1));
+    auto roughTex = std::make_shared<GSolidColor>(GFColor(0.1, 0., 0., 1));
+    auto checkerTex = std::make_shared<GCheckerTexture>(100, GColor::whiteF, GColor::grayF * 1.5);
+    auto redLambertMat = std::make_shared<GLambertianMaterial>(GColor::redF);
+    auto greenLambertMat = std::make_shared<GLambertianMaterial>(GColor::greenF);
+    auto grayLambertMat = std::make_shared<GLambertianMaterial>(GColor::grayF);
+    auto checkerLambertMat = std::make_shared<GLambertianMaterial>(checkerTex);
+    auto lightGrayMetalMat = std::make_shared<GSpecularMaterial>(lightGrayTex);
+    auto goldSpecMat = std::make_shared<GSpecularMaterial>(goldTex);
+    auto goldGlossyMat = std::make_shared<GGlossyMaterial>(goldTex, roughTex);
+    auto ironSpecMat = std::make_shared<GSpecularMaterial>(ironTex);
+    {
+        auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
+        sphereGObj0->SetT(vec3f(-0.5, 0.5, 3));
+        scene.add(sphereGObj0);
+    }
+    {
+        //auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
+        //auto sphereGObj2 = std::make_shared<GSphereModel>(vec3(0, 0.5, 0), 0.5, ironSpecMat);
+        auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, ironSpecMat);
+        sphereGObj2->SetT(vec3f(0, 0.5, 2));
+        scene.add(sphereGObj2);
+    }
+    {
+        //auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldSpecMat);
+        auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldGlossyMat);
+        sphereGObj3->SetT(vec3f(0.5, 0.5, 1));
+        scene.add(sphereGObj3);
+    }
+    {
+        auto sphereGObj1 = std::make_shared<GSphereModel>(100, checkerLambertMat);
+        sphereGObj1->SetT(vec3f(0, -100, 2));
+        scene.add(sphereGObj1);
+    }
+    {
+        for(int i=-5; i<=5; i++)
+        {
+            for(int j=-5; j<=5; j++)
+            {
+                auto randomMat = GSampler::Random();
+                vec3 center(i + 0.9*GSampler::Random(), 0.2, 2 + j + 0.9*GSampler::Random());
+                if((center - vec3(0, 0.2, 2)).length() > 0.9)
+                {
+                    std::shared_ptr<GMaterial> mat;
+                    std::shared_ptr<GModel> model;
+                    std::shared_ptr<GTexture> tex;
+                    if(randomMat < 0.8)
+                    {
+                        auto Kd = GColor::RandomF();
+                        mat = make_shared<GLambertianMaterial>(Kd);
+                    }
+                    else if(randomMat < 0.95)
+                    {
+                        auto Ks = GColor::RandomF();
+                        mat = make_shared<GSpecularMaterial>(Ks);
+                    }
+                    else
+                    {
+                        auto Ks = GColor::RandomF();
+                        auto rough = GSampler::Random(0.1, 0.9);
+                        mat = make_shared<GGlossyMaterial>(Ks, rough);
+                    }
+                    model = make_shared<GSphereModel>(0.2, mat);
+                    model->SetT(center);
+                    scene.add(model);
+                }
+            }
+        }
+    }
+    scene.BuildBVHTree();
 }
 
 void GRaytracer::SetupGRaytracer()
@@ -177,11 +275,10 @@ void GRaytracer::RefreshUI()
     ui->rotationYLineEdit->setText(QString("%1").arg(mainCamera->rotation().y()));
     ui->rotationZLineEdit->setText(QString("%1").arg(mainCamera->rotation().z()));
     ui->fovLineEdit->setText(QString("%1").arg(mainCamera->fov));
+    ui->focalDisEdit->setText(QString("%1").arg(mainCamera->focalDistance));
+    ui->lenREdit->setText(QString("%1").arg(mainCamera->apertureRadius));
     ui->sppEdit->setText(QString("%1").arg(integrator->spp));
     ui->depthLineEdit->setText(QString("%1").arg(integrator->maxDepth));
-    //ui->fillModeCB->setCurrentIndex((int)GLAPI->activePolygonMode);
-    //ui->depthBModeCB->setCurrentIndex(GLAPI->enableWBuffer ? 1 : 0);
-    //ui->cullModeCB->setCurrentIndex((int)GLAPI->cullFaceType);
 }
 
 void GRaytracer::OnPreDraw()
@@ -235,6 +332,8 @@ void GRaytracer::on_drawProp_changed()
     rot.SetZ(ui->rotationZLineEdit->text().toFloat());
     mainCamera->SetR(rot);
     mainCamera->SetFov(ui->fovLineEdit->text().toFloat());
+    mainCamera->focalDistance = std::max(0.01f, ui->focalDisEdit->text().toFloat());
+    mainCamera->apertureRadius = std::max(0.00f, ui->lenREdit->text().toFloat());
     integrator->spp = std::max(ui->sppEdit->text().toInt(), 1);
     integrator->maxDepth = std::max(ui->depthLineEdit->text().toInt(), 1);
 }

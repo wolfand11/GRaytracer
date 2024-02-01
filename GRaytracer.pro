@@ -26,6 +26,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+        gaabb.cpp \
+        gbvh.cpp \
         gcamera.cpp \
         gcolor.cpp \
         ggameobject.cpp \
@@ -35,16 +37,20 @@ SOURCES += \
         gmath.cpp \
         gmathutils.cpp \
         gmodel.cpp \
+        gobjmodel.cpp \
         gray.cpp \
         graytracer.cpp \
         gsampler.cpp \
         gtexture.cpp \
+        gtriangle.cpp \
         gutils.cpp \
         main.cpp \
         tgaimage.cpp
 
 HEADERS += \
+        gaabb.h \
         gbuffer.h \
+        gbvh.h \
         gcamera.h \
         gcolor.h \
         ggameobject.h \
@@ -56,11 +62,13 @@ HEADERS += \
         gmath.h \
         gmathutils.h \
         gmodel.h \
+        gobjmodel.h \
         gray.h \
         graytracer.h \
         gsampler.h \
         gscene.h \
         gtexture.h \
+        gtriangle.h \
         gutils.h \
         tgaimage.h
 

@@ -4,13 +4,13 @@
 using namespace GMath;
 using namespace std;
 
-GMath::GRay::GRay(vec3 origin, vec3 dir)
-    :origin(origin), dir(dir)
+GRay::GRay(vec3 origin, vec3 dir, double time)
+    :origin(origin), dir(dir), time(time)
 {
 
 }
 
-GMath::vec3 GMath::GRay::GetPos(float t) const
+GMath::vec3 GRay::GetPos(float t) const
 {
     return origin + dir * t;
 }
@@ -27,4 +27,9 @@ GFColor GSurfaceInteraction::Le(const GScene& scene, const vec3 &w) const
         return light->Le(scene, *this, w);
     }
     return GColor::blackF;
+}
+
+GHittable::GHittable()
+{
+
 }

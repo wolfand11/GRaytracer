@@ -34,9 +34,6 @@ public:
     static GMath::vec3f Deg2Rad(GMath::vec3f degree);
 
     // color helper
-
-    // ray helper
-    static bool intersect(const GMath::GRay& r, GMath::interval ray_t, const GMath::aabb& bbox);
 };
 
 #endif // GMATHUTILS_H

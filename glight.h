@@ -14,22 +14,26 @@ enum GLightType
 };
 
 class GScene;
-class GLight : public GGameObject
+class GLight : public GGameObject, public GHittable
 {
 public:
     // light
     GLight(GLightType lightType, GFColor lColor=GColor::whiteF);
 
-    virtual bool intersect(const GMath::GRay& ray, GMath::interval ray_t, GMath::GSurfaceInteraction& isect)
+    bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) override
     {
         return false;
     }
-    virtual GFColor Le(const GMath::GRay& ray)
+    GMath::GAABB<double> bBox() const override
+    {
+        return aabb();
+    }
+    virtual GFColor Le(const GRay& ray)
     {
         return GColor::blackF;
     }
-    virtual GFColor Le(const GScene& scene, const GMath::GSurfaceInteraction& isect, const GMath::vec3& w);
-    virtual GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf);
+    virtual GFColor Le(const GScene& scene, const GSurfaceInteraction& isect, const GMath::vec3& w);
+    virtual GFColor Sample_Li(const GScene& scene, const GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf);
 
     GFColor lightColor;
     GLightType lightType;
@@ -43,7 +47,7 @@ public:
     {
     }
 
-    GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
+    GFColor Sample_Li(const GScene& scene, const GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
 };
 
 class GPointLight: public GLight
@@ -54,7 +58,7 @@ public:
     {
     }
 
-    GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
+    GFColor Sample_Li(const GScene& scene, const GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
 };
 
 
@@ -65,7 +69,7 @@ public:
         :GLight(GLightType::kLTSky)
     {
     }
-    GFColor Le(const GMath::GRay& ray) override;
+    GFColor Le(const GRay& ray) override;
 };
 
 class GDiffuseAreaLight : public GLight
@@ -74,10 +78,15 @@ public:
     GDiffuseAreaLight(std::shared_ptr<GShape> shape, GFColor lColor=GColor::whiteF, bool twoSided=true)
         :GLight(GLightType::kLTDiffuseArea, lColor),twoSided(twoSided),shape(shape)
     {
+        shape->owner = this;
     }
 
-    GFColor Le(const GScene& scene, const GMath::GSurfaceInteraction& isect, const GMath::vec3& w) override;
-    GFColor Sample_Li(const GScene& scene, const GMath::GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
+    GFColor Le(const GScene& scene, const GSurfaceInteraction& isect, const GMath::vec3& w) override;
+    GFColor Sample_Li(const GScene& scene, const GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
+    aabb bBox() const override
+    {
+        return shape->bBox() + (vec3)_position;
+    }
 
     bool twoSided;
     std::shared_ptr<GShape> shape;
@@ -91,7 +100,7 @@ public:
     {
     }
 
-    bool intersect(const GMath::GRay& ray, GMath::interval ray_t, GMath::GSurfaceInteraction& isect) override;
+    bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) override;
 };
 
 

@@ -1,6 +1,7 @@
 #include "gcamera.h"
 #include "gutils.h"
 #include "gmathutils.h"
+#include "gsampler.h"
 
 using namespace GMath;
 using namespace std;
@@ -135,11 +136,21 @@ GRay GCamera::GetRay(double i, double j)
     r.origin = _position;
     r.dir = vec3(wPos.x()-_position.x(), wPos.y()-_position.y(), wPos.z()-_position.z());
     r.dir.normalize();
+    if(apertureRadius>0.01)
+    {
+        vec3 pLens = GSampler::RandomVec3InUnitDisk()*apertureRadius + r.origin;
+        float ft = focalDistance / r.dir.z();
+        vec3 pFocus = r.origin + r.dir * ft;
+        r.origin = pLens;
+        r.dir = (pFocus - r.origin);
+        r.dir.normalize();
+    }
+    r.time = GSampler::Random();
     return r;
 }
 
 /*
-GFColor GCamera::RayColor(const GMath::GRay &ray, int depth)
+GFColor GCamera::RayColor(const GRay &ray, int depth)
 {
     vec3 normalizedDir = ray.dir;
     normalizedDir.normalize();

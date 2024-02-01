@@ -3,6 +3,7 @@
 
 #include "ggameobject.h"
 #include "gray.h"
+#include "gbuffer.h"
 
 class GCamera : public GGameObject
 {
@@ -30,10 +31,12 @@ public:
     float near{0.1};
     float far{200.0f};
     float aspectRatio{1.0f};
+    float focalDistance{10.f};
+    float apertureRadius{1.f};
     GMath::mat4f& LookAt(GMath::vec3f eyePos, GMath::vec3f lookAtPoint, GMath::vec3f up);
     void ProjInvertProj(const GMath::mat4f*& tproj,const GMath::mat4f*& tinvertProj);
-    GMath::GRay GetRay(double i, double j);
-    //GFColor RayColor(const GMath::GRay& ray, int depth);
+    GRay GetRay(double i, double j);
+    //GFColor RayColor(const GRay& ray, int depth);
 
 private:
     // camera

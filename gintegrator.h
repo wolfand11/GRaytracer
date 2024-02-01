@@ -12,8 +12,8 @@ public:
     {}
     virtual ~GIntegrator(){}
     virtual void Render(GScene &scene);
-    virtual GFColor Li(GMath::GRay& ray, GScene& scene, int depth);
-    GFColor SampleLight(const GScene& scene, GMath::GSurfaceInteraction& isect);
+    virtual GFColor Li(GRay& ray, GScene& scene, int depth);
+    GFColor SampleLight(const GScene& scene, GSurfaceInteraction& isect);
 
     int spp = 1;
     int maxDepth = 1;

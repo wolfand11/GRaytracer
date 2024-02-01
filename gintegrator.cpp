@@ -26,7 +26,7 @@ void GIntegrator::Render(GScene &scene)
     }
 }
 
-GFColor GIntegrator::Li(GMath::GRay &ray, GScene &scene, int depth)
+GFColor GIntegrator::Li(GRay &ray, GScene &scene, int depth)
 {
     GFColor L = GColor::blackF;
     GFColor beta = GColor::whiteF;
@@ -35,6 +35,7 @@ GFColor GIntegrator::Li(GMath::GRay &ray, GScene &scene, int depth)
     for(bounces=0; ;++bounces)
     {
         GSurfaceInteraction isect;
+        isect.time = ray.time;
         interval ray_t = interval::init;
         bool hited = scene.intersect(ray, ray_t, isect);
         if(bounces == 0 || specularBounce)
@@ -95,8 +96,8 @@ GFColor GIntegrator::Li(GMath::GRay &ray, GScene &scene, int depth)
 }
 
 // Tips: don't return beta.
-// GFColor GIntegrator::SampleLight(const GScene &scene, const GMath::GSurfaceInteraction &isect, GFColor& beta)
-GFColor GIntegrator::SampleLight(const GScene &scene, GMath::GSurfaceInteraction &isect)
+// GFColor GIntegrator::SampleLight(const GScene &scene, const GSurfaceInteraction &isect, GFColor& beta)
+GFColor GIntegrator::SampleLight(const GScene &scene, GSurfaceInteraction &isect)
 {
     GFColor Ld = GColor::blackF;
     for(auto light : scene.lights)
