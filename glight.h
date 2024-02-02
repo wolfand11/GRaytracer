@@ -24,7 +24,7 @@ public:
     {
         return false;
     }
-    GMath::GAABB<double> bBox() const override
+    GMath::GAABB<double> bBox() override
     {
         return aabb();
     }
@@ -83,7 +83,7 @@ public:
 
     GFColor Le(const GScene& scene, const GSurfaceInteraction& isect, const GMath::vec3& w) override;
     GFColor Sample_Li(const GScene& scene, const GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
-    aabb bBox() const override
+    aabb bBox() override
     {
         return shape->bBox() + (vec3)_position;
     }

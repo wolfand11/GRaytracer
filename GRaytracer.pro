@@ -41,6 +41,7 @@ SOURCES += \
         gray.cpp \
         graytracer.cpp \
         gsampler.cpp \
+        gshape.cpp \
         gtexture.cpp \
         gtriangle.cpp \
         gutils.cpp \
@@ -67,6 +68,7 @@ HEADERS += \
         graytracer.h \
         gsampler.h \
         gscene.h \
+        gshape.h \
         gtexture.h \
         gtriangle.h \
         gutils.h \

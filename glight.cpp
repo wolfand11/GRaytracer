@@ -6,6 +6,7 @@ using namespace GMath;
 GLight::GLight(GLightType lightType, GFColor lColor)
     :GGameObject(GGameObject::GGameObjectType::kLight),lightType(lightType),lightColor(lColor)
 {
+    owner = this;
 }
 
 GFColor GLight::Le(const GScene &scene, const GSurfaceInteraction &isect, const vec3 &w)
@@ -80,7 +81,7 @@ GFColor GDiffuseAreaLight::Le(const GScene& scene, const GSurfaceInteraction &is
 GFColor GDiffuseAreaLight::Sample_Li(const GScene &scene, const GSurfaceInteraction &isect, vec3 &wi, float &pdf)
 {
     const GGameObject& self = *this;
-    GSurfaceInteraction intr = shape->Sample(self, isect, pdf);
+    GSurfaceInteraction intr = shape->Sample(isect, pdf);
     vec3 rayDir = intr.p - isect.p;
     if(pdf==0 || rayDir.length2()==0)
     {

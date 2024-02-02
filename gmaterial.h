@@ -11,6 +11,12 @@ class GMaterial
 {
 public:
     virtual ~GMaterial() = default;
+    virtual void Init(shared_ptr<GTexture> Kd, shared_ptr<GTexture> Ks, shared_ptr<GTexture> roughness)
+    {
+        this->Kd = Kd;
+        this->Ks = Ks;
+        this->roughness = roughness;
+    }
     virtual GFColor Sample_f(GSurfaceInteraction& isect, float& pdf) const;
     virtual GFColor f(const GSurfaceInteraction& isect) const = 0;
     virtual float Pdf(const GSurfaceInteraction& isect) const;
@@ -22,37 +28,41 @@ public:
         auto pow5 =[](float v) {return v * v * v * v * v;};
         return Ks + (GColor::whiteF - Ks) * pow5(1-cosTheta);
     }
+
+    shared_ptr<GTexture> Kd;
+    shared_ptr<GTexture> Ks;
+    shared_ptr<GTexture> roughness;
 };
 
 
 class GLambertianMaterial : public GMaterial
 {
 public:
+    GLambertianMaterial()=default;
     GLambertianMaterial(const GFColor& Kd)
-        :Kd(std::make_shared<GSolidColor>(Kd))
     {
+        this->Kd = std::make_shared<GSolidColor>(Kd);
     }
     GLambertianMaterial(shared_ptr<GTexture> Kd)
-        :Kd(Kd)
     {
+        this->Kd = Kd;
     }
 
     GFColor f(const GSurfaceInteraction& isect) const;
-
-private:
-    shared_ptr<GTexture> Kd;
 };
 
 class GSpecularMaterial : public GMaterial
 {
 public:
+    GSpecularMaterial()=default;
     GSpecularMaterial(const GFColor& Ks)
-        :Ks(std::make_shared<GSolidColor>(Ks))
     {
+        this->Ks = std::make_shared<GSolidColor>(Ks);
     }
     GSpecularMaterial(shared_ptr<GTexture> Ks)
-        :Ks(Ks)
-    {}
+    {
+        this->Ks = Ks;
+    }
 
     GFColor Sample_f(GSurfaceInteraction& isect, float& pdf) const;
     GFColor f(const GSurfaceInteraction& isect) const
@@ -64,20 +74,22 @@ public:
         return 0;
     }
     virtual bool IsSpecular() { return true; }
-private:
-    shared_ptr<GTexture> Ks;
 };
 
 class GGlossyMaterial : public GMaterial
 {
 public:
+    GGlossyMaterial()=default;
     GGlossyMaterial(const GFColor& Ks, float roughness)
-        :Ks(std::make_shared<GSolidColor>(Ks)), roughness(std::make_shared<GSolidColor>(roughness))
     {
+        this->Ks = std::make_shared<GSolidColor>(Ks);
+        this->roughness = std::make_shared<GSolidColor>(roughness);
     }
     GGlossyMaterial(shared_ptr<GTexture> Ks, shared_ptr<GTexture> roughness)
-        :Ks(Ks), roughness(roughness)
-    {}
+    {
+        this->Ks = Ks;
+        this->roughness = roughness;
+    }
     GFColor Sample_f(GSurfaceInteraction& isect, float& pdf) const;
     GFColor f(const GSurfaceInteraction& isect) const;
     float Pdf(const GSurfaceInteraction& isect) const;
@@ -86,8 +98,5 @@ public:
     float V_SmithGGXCorrelatedFast(float NoV, float NoL, float roughness) const;
     GMath::vec3 Sample_wh(const GSurfaceInteraction& isect) const;
     float Pdf_wh(const GSurfaceInteraction& isect, const GMath::vec3& wh) const;
-private:
-    shared_ptr<GTexture> Ks;
-    shared_ptr<GTexture> roughness;
 };
 #endif // GMATERIAL_H

@@ -72,7 +72,7 @@ public:
 
     virtual bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) = 0;
 
-    virtual GMath::GAABB<double> bBox() const = 0;
+    virtual GMath::GAABB<double> bBox() = 0;
 
     GGameObject* owner;
 };

@@ -74,7 +74,15 @@ public:
         }
     }
 
-    aabb bBox() const
+    void add(std::vector<std::shared_ptr<GTriangleModel> >& gObjList)
+    {
+        for(auto& gobj : gObjList)
+        {
+            add(gobj);
+        }
+    }
+
+    aabb bBox()
     {
         return bbox;
     }

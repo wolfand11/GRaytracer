@@ -1,6 +1,7 @@
 #ifndef GTRIANGLE_H
 #define GTRIANGLE_H
 
+#include "gshape.h"
 #include "gmodel.h"
 #include "gobjmodel.h"
 
@@ -13,6 +14,9 @@ public:
         Q = objModel->vert(faceIndex, 0);
         auto p1 = objModel->vert(faceIndex, 1);
         auto p2 = objModel->vert(faceIndex, 2);
+        uv0 = objModel->uv(faceIndex, 0);
+        uv1 = objModel->uv(faceIndex, 1);
+        uv2 = objModel->uv(faceIndex, 2);
         u = p1 - Q;
         v = p2 - Q;
         auto tmpN = cross(u, v);
@@ -20,11 +24,12 @@ public:
         D = dot(geoNormal.normalize(), Q);
         w = tmpN / dot(tmpN,tmpN);
 
-        bbox = aabb(Q, Q+u+v).pad();
+        bbox = aabb(Q, p1, p2).pad();
+        area =tmpN.length() * 0.5;
     }
 
-    GSurfaceInteraction Sample(const GGameObject& owner, float& pdf, double time) const override;
-    GSurfaceInteraction Sample(const GGameObject& owner, const GSurfaceInteraction& ref, float& pdf) const override;
+    GSurfaceInteraction Sample(float& pdf, double time) const override;
+    GSurfaceInteraction Sample(const GSurfaceInteraction& ref, float& pdf) const override;
     bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) override;
 
     std::shared_ptr<GOBJModel> objModel;
@@ -35,13 +40,9 @@ public:
     vec3 v;
     double D;
     vec3 w;
+    vec2 uv0;
+    vec2 uv1;
+    vec2 uv2;
     double area;
 };
-
-class GTriangleList : public GShapeList
-{
-public:
-    std::shared_ptr<GOBJModel> objModel;
-};
-
 #endif // GTRIANGLE_H

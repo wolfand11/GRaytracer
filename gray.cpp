@@ -1,5 +1,4 @@
 #include "gray.h"
-#include "gmaterial.h"
 #include "glight.h"
 using namespace GMath;
 using namespace std;
@@ -27,9 +26,4 @@ GFColor GSurfaceInteraction::Le(const GScene& scene, const vec3 &w) const
         return light->Le(scene, *this, w);
     }
     return GColor::blackF;
-}
-
-GHittable::GHittable()
-{
-
 }

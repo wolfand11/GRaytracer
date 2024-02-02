@@ -26,9 +26,9 @@ public:
 
     GAABB(const GVect<T,3>& a, const GVect<T,3>& b, const GVect<T,3>& c)
     {
-        x = GInterval<T>(std::fmin(a[0], b[0], c[0]), std::fmax(a[0], b[0], c[0]));
-        y = GInterval<T>(std::fmin(a[1], b[1], c[1]), std::fmax(a[1], b[1], c[1]));
-        z = GInterval<T>(std::fmin(a[2], b[2], c[2]), std::fmax(a[2], b[2], c[2]));
+        x = GInterval<T>(std::min(std::min(a[0], b[0]), c[0]), std::max(std::max(a[0], b[0]), c[0]));
+        y = GInterval<T>(std::min(std::min(a[1], b[1]), c[1]), std::max(std::max(a[1], b[1]), c[1]));
+        z = GInterval<T>(std::min(std::min(a[2], b[2]), c[2]), std::max(std::max(a[2], b[2]), c[2]));
     }
 
     GAABB(const GAABB<T>& box0, const GAABB<T>& box1)
@@ -84,6 +84,26 @@ template <typename T>
 GAABB<T> operator+(const GVect<T,3> offset,const GAABB<T>& bbox)
 {
     return bbox + offset;
+}
+
+template <typename T>
+GAABB<T> transformBBox(const GAABB<T> &box, const mat4f &mat)
+{
+    vec3 xa = mat.col(0).xyz() * box.x.min;
+    vec3 xb = mat.col(0).xyz() * box.x.max;
+    vec3 ya = mat.col(1).xyz() * box.y.min;
+    vec3 yb = mat.col(1).xyz() * box.y.max;
+    vec3 za = mat.col(2).xyz() * box.z.min;
+    vec3 zb = mat.col(2).xyz() * box.z.max;
+
+    float w = mat[3][3];
+    vec3 pmin_ = min(xa,xb) + min(ya,yb) + min(za,zb) + (vec3)(mat.col(3).xyz());
+    vec3 pmax_ = max(xa,xb) + max(ya,yb) + max(za,zb) + (vec3)(mat.col(3).xyz());
+    GAABB<T> b;
+    b.x = GInterval<T>(pmin_[0]/w, pmax_[0]/w);
+    b.y = GInterval<T>(pmin_[1]/w, pmax_[1]/w);
+    b.z = GInterval<T>(pmin_[2]/w, pmax_[2]/w);
+    return b;
 }
 
 typedef GAABB<float> aabbf;

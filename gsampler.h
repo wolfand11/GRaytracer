@@ -55,6 +55,17 @@ public:
         }
     }
 
+    // return barycentric coordinates
+    static inline vec3 UniformSampleTriangle()
+    {
+        double ksi0 = Random();
+        double sqrtKsi0 = std::sqrt(ksi0);
+        double ksi1 = Random();
+        vec3 bCoord = (1.0-sqrtKsi0, ksi1*sqrtKsi0, 0);
+        bCoord.SetZ(1-bCoord.x()-bCoord.y());
+        return bCoord;
+    }
+
     static inline vec3 UniformSampleSphere()
     {
         double ksi0 = Random();

@@ -107,6 +107,7 @@ void GRaytracer::CreateScene()
     {
         auto lightGObj = std::make_shared<GDirectionalLight>();
         lightGObj->SetR(vec3f(50,0,0));
+        scene.add(lightGObj);
     }
     {
         auto skyLightGObj = std::make_shared<GSkyLight>();
@@ -148,31 +149,49 @@ void GRaytracer::CreateTestScene()
     {
         auto sphereGObj0 = std::make_shared<GSphereModel>(0.5, redLambertMat);
         sphereGObj0->SetT(vec3f(0, 0.5, 1));
-        scene.add(sphereGObj0);
+        //scene.add(sphereGObj0);
     }
     {
         //auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
         auto sphereGObj2 = std::make_shared<GSphereModel>(vec3(0, 0.5, 0), 0.5, ironSpecMat);
         sphereGObj2->SetT(vec3f(-1.2, 0.5, 1));
-        scene.add(sphereGObj2);
+        //scene.add(sphereGObj2);
     }
     {
         //auto sphereGObj2 = std::make_shared<GSphereModel>(0.5, greenLambertMat);
         auto sphereGObj2 = std::make_shared<GSphereModel>(0.2, ironSpecMat);
         sphereGObj2->SetT(vec3f(-2.5, 0.2, 1));
-        scene.add(sphereGObj2);
+        //scene.add(sphereGObj2);
     }
     {
         //auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldSpecMat);
         auto sphereGObj3 = std::make_shared<GSphereModel>(0.5, goldGlossyMat);
         sphereGObj3->SetT(vec3f(1.2, 0.5, 1));
-        scene.add(sphereGObj3);
+        //scene.add(sphereGObj3);
     }
     {
         auto sphereGObj1 = std::make_shared<GSphereModel>(100, checkerLambertMat);
         //auto sphereGObj1 = std::make_shared<GSphereModel>(100, redLambertMat);
         sphereGObj1->SetT(vec3f(0, -100, 1));
         scene.add(sphereGObj1);
+    }
+    {
+        auto mat = make_shared<GLambertianMaterial>();
+        auto triMesh0 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/cube.obj"), mat);
+        //auto triMesh0 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/cube-front.obj"), mat);
+        for(auto tri : triMesh0)
+        {
+            tri->SetT(vec3f(0, 0.5, 1));
+            tri->SetR(vec3f(0, 45, 0));
+        }
+        scene.add(triMesh0);
+        auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/cube-front.obj"), mat);
+        for(auto tri : triMesh1)
+        {
+            tri->SetT(vec3f(-1, 0.5, 1));
+            tri->SetR(vec3f(0, 45, 0));
+        }
+        //scene.add(triMesh1);
     }
     scene.BuildBVHTree();
 }

@@ -235,6 +235,29 @@ T absDot(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
     return std::abs(dot(lhs, rhs));
 }
 
+template <typename T, int n>
+GVect<T,n> min(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
+{
+    GVect<T,n> ret;
+    for(int i=0; i<n; i++)
+    {
+        ret[i] = std::min(lhs[i], rhs[i]);
+    }
+    return ret;
+}
+
+template <typename T, int n>
+GVect<T,n> max(const GVect<T,n>& lhs, const GVect<T,n>& rhs)
+{
+    GVect<T,n> ret;
+    for(int i=0; i<n; i++)
+    {
+        ret[i] = std::max(lhs[i], rhs[i]);
+    }
+    return ret;
+}
+
+
 template <typename T, int n, int m>
 GVect<T,n> embed(const GVect<T,m>& v, const T fill)
 {
@@ -529,9 +552,9 @@ public:
         return max - min;
     }
 
-    GInterval expand(T delta) const{
+    GInterval<T> expand(T delta) const{
         auto padding = delta / 2.0;
-        return interval(min - padding, max+padding);
+        return GInterval<T>(min - padding, max+padding);
     }
 
     bool contains(T x) const{

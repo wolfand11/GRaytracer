@@ -15,7 +15,7 @@ public:
 
     bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) override;
 
-    aabb bBox() const override
+    aabb bBox() override
     {
         return bbox;
     }
