@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 
+#pragma pack(push, 1)
 struct TGA_Header {
     std::uint8_t  idlength{};
     std::uint8_t  colormaptype{};
@@ -20,6 +21,7 @@ struct TGA_Header {
     std::uint8_t  bitsperpixel{};
     std::uint8_t  imagedescriptor{};
 };
+#pragma pack(pop)
 
 struct TGAColor {
     std::uint8_t bgra[4] = {0,0,0,0};
