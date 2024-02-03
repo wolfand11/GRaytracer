@@ -38,6 +38,8 @@ bool GSphere::intersect(const GRay &ray, GMath::interval ray_t, GSurfaceInteract
     isect.SetFaceNormal(ray, outNormal);
     isect.wo = -ray.dir;
     isect.uv = getUV(isect.p);
+    vec3 bitangent;
+    GMathUtils::CoordinateSystem(isect.normal, isect.tangent, bitangent);
     return true;
 }
 

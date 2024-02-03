@@ -79,7 +79,7 @@ GFColor GIntegrator::Li(GRay &ray, GScene &scene, int depth)
         GFColor f = isect.material->Sample_f(isect, pdf);
         if(GColor::IsBlack(f) || pdf==0.f) break;
 
-        beta = beta * f * absDot(isect.wi, isect.normal) / pdf;
+        beta = beta * f * absDot(isect.wi, isect.shadingNormal) / pdf;
         specularBounce = isect.material->IsSpecular();
         ray.origin = isect.p;
         ray.dir = isect.wi;
@@ -107,7 +107,7 @@ GFColor GIntegrator::SampleLight(const GScene &scene, GSurfaceInteraction &isect
         GFColor Li = light->Sample_Li(scene, isect, wi, lightPdf);
         if(GColor::IsBlack(Li) || lightPdf == 0) continue;
         isect.wi = wi;
-        GFColor f = isect.material->f(isect) * absDot(wi, isect.normal);
+        GFColor f = isect.material->f(isect) * absDot(wi, isect.shadingNormal);
         float scatteringPdf = isect.material->Pdf(isect);
         if(!GColor::IsBlack(f))
         {

@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 
+// pack(push, 1) force struct alignment with 1 byte
 #pragma pack(push, 1)
 struct TGA_Header {
     std::uint8_t  idlength{};

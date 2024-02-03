@@ -29,6 +29,20 @@ public:
         auto pow5 =[](float v) {return v * v * v * v * v;};
         return Ks + (GColor::whiteF - Ks) * pow5(1-cosTheta);
     }
+    void UpdateShadingNormal(GSurfaceInteraction& isect) const
+    {
+        if(normal!=nullptr)
+        {
+            vec3f tNormal = (vec3f)normal->sample(isect.uv, isect.p).xyz().normalize();
+            tNormal = tNormal * 2 - vec3f::one;
+            vec3 wBitangent = cross(isect.tangent, isect.normal);
+            isect.shadingNormal = isect.tangent * tNormal.x() + wBitangent * tNormal.y() + isect.normal * tNormal.z();
+        }
+        else
+        {
+            isect.shadingNormal = isect.normal;
+        }
+    }
 
     shared_ptr<GTexture> Kd;
     shared_ptr<GTexture> Ks;

@@ -22,8 +22,8 @@ bool GSphereModel::intersect(const GRay &ray, GMath::interval ray_t, GSurfaceInt
     if(sphere->intersect(ray, ray_t, isect))
     {
         isect.model = this;
-        isect.uv = sphere->getUV(isect.p);
         isect.material = material.get();
+        isect.material->UpdateShadingNormal(isect);
         isect.light = nullptr;
         return true;
     }
@@ -77,6 +77,7 @@ bool GTriangleModel::intersect(const GRay &ray, interval ray_t, GSurfaceInteract
     {
         isect.model = this;
         isect.material = material.get();
+        isect.material->UpdateShadingNormal(isect);
         isect.light = nullptr;
         return true;
     }

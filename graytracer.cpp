@@ -187,7 +187,8 @@ void GRaytracer::CreateTestScene()
         }
         //scene.add(triMesh0);
         */
-        auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/diablo3_pose/diablo3_pose.obj"), mat);
+        //auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/diablo3_pose/diablo3_pose.obj"), mat);
+        auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/girl/DancingGirl.obj"), mat);
         for(auto tri : triMesh1)
         {
             tri->SetT(vec3f(0, 1, 1));

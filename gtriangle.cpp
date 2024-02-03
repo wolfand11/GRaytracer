@@ -4,14 +4,14 @@
 
 GSurfaceInteraction GTriangle::Sample(float &pdf, double time) const
 {
-    const mat4f* trsMat; // obj2World
-    const mat4f* invertTRSMat; // world2Obj
-    this->owner->TRSInvertTRS(trsMat, invertTRSMat);
+    const mat4f* obj2World; // obj2World
+    const mat4f* world2Obj; // world2Obj
+    this->owner->TRSInvertTRS(obj2World, world2Obj);
 
     vec3 b = GSampler::UniformSampleTriangle();
     vec3 localPos = Q * b.x() + (Q+u) * b.y() + (Q+v) * b.z();
     vec2 uv = uv0 * b.x() + uv1 * b.y() + uv2 * b.z();
-    vec4 tmpWPos = ((*trsMat) * (vec4f)embed<double,4>(localPos, 1.));
+    vec4 tmpWPos = ((*obj2World) * (vec4f)embed<double,4>(localPos, 1.));
     GSurfaceInteraction intr;
     intr.p = tmpWPos.xyz();
     intr.normal = geoNormal;
@@ -40,16 +40,16 @@ GSurfaceInteraction GTriangle::Sample(const GSurfaceInteraction &ref, float &pdf
 
 bool GTriangle::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &isect)
 {
-    const mat4f* trsMat; // obj2World
-    const mat4f* invertTRSMat; // world2Obj
-    owner->TRSInvertTRS(trsMat, invertTRSMat);
+    const mat4f* obj2World; // obj2World
+    const mat4f* world2Obj; // world2Obj
+    owner->TRSInvertTRS(obj2World, world2Obj);
 
     vec4 tmpRayO = vec4::one;
     tmpRayO.SetXYZ(ray.origin);
-    vec3 localRayO = ((*invertTRSMat) * (vec4f)tmpRayO).xyz();
+    vec3 localRayO = ((*world2Obj) * (vec4f)tmpRayO).xyz();
     vec4 tmpRayDir = vec4::zero;
     tmpRayDir.SetXYZ(ray.dir);
-    vec3 localRayDir = ((*invertTRSMat) * (vec4f)tmpRayDir).xyz();
+    vec3 localRayDir = ((*world2Obj) * (vec4f)tmpRayDir).xyz();
     double rayScale = localRayDir.length() / ray.dir.length();
 
     auto DoN = dot(geoNormal, localRayDir);
@@ -71,13 +71,15 @@ bool GTriangle::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &
         return false;
     }
 
-    vec4f hitPos = (*trsMat) * (vec4f)embed<double,4>(localHitPos, 1.0);
-    vec4 wNormalTmp = (*invertTRSMat).transpose() * (vec4f)embed<double,4>(geoNormal, 0.0);
+    vec4f hitPos = (*obj2World) * (vec4f)embed<double,4>(localHitPos, 1.0);
+    vec4 wNormalTmp = (*world2Obj).transpose() * (vec4f)embed<double,4>(geoNormal, 0.0);
     vec3 wNormal = wNormalTmp.xyz();
+    vec4 wTangent = (*obj2World) * (vec4f)embed<double,4>(geoTangent, 0.0);
     isect.p = hitPos.xyz();
     isect.t = t * rayScale;
     isect.time = ray.time;
     isect.SetFaceNormal(ray, wNormal);
+    isect.tangent = wTangent.xyz();
     isect.wo = -ray.dir;
     isect.uv = uv0 * alpha + uv1 * beta + uv2 *(1-alpha-beta);
     return true;

@@ -46,6 +46,8 @@ class GSurfaceInteraction
 public:
     vec3 p;
     vec3 normal;
+    vec3 tangent;
+    vec3 shadingNormal;
     vec3 wo;
     vec3 wi;
     vec2 uv;

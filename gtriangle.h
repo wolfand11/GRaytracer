@@ -21,7 +21,8 @@ public:
         v = p2 - Q;
         auto tmpN = cross(u, v);
         geoNormal = tmpN;
-        D = dot(geoNormal.normalize(), Q);
+        geoTangent = cross(geoNormal.normalize(), v).normalize();
+        D = dot(geoNormal, Q);
         w = tmpN / dot(tmpN,tmpN);
 
         bbox = aabb(Q, p1, p2).pad();
@@ -34,6 +35,7 @@ public:
 
     std::shared_ptr<GOBJModel> objModel;
     int faceIndex;
+    vec3 geoTangent;
     vec3 geoNormal;
     vec3 Q;
     vec3 u;

@@ -8,15 +8,15 @@ using namespace GMath;
 GFColor GMaterial::Sample_f(GSurfaceInteraction& isect, float& pdf) const
 {
     isect.wi = GSampler::CosineSampleHemisphere();
-    SameHemisphere(isect.normal, isect.wo, isect.wi);
+    SameHemisphere(isect.shadingNormal, isect.wo, isect.wi);
     pdf = Pdf(isect);
     return f(isect);
 }
 
 float GMaterial::Pdf(const GSurfaceInteraction& isect) const
 {
-    float cosThetaI = dot(isect.wi, isect.normal);
-    bool isInSameHemisphere = (dot(isect.wo, isect.normal) * cosThetaI) > 0;
+    float cosThetaI = dot(isect.wi, isect.shadingNormal);
+    bool isInSameHemisphere = (dot(isect.wo, isect.shadingNormal) * cosThetaI) > 0;
     if(isInSameHemisphere)
     {
         return std::abs(cosThetaI) * M_INVERSE_PI;
@@ -45,23 +45,23 @@ GFColor GLambertianMaterial::f(const GSurfaceInteraction& isect) const
 
 GFColor GSpecularMaterial::Sample_f(GSurfaceInteraction& isect, float &pdf) const
 {
-    isect.wi = reflect(isect.wo, isect.normal);
+    isect.wi = reflect(isect.wo, isect.shadingNormal);
     pdf = 1;
-    auto cosTheta = absDot(isect.wi, isect.normal);
+    auto cosTheta = absDot(isect.wi, isect.shadingNormal);
     GFColor F = SchlickFresnel(Ks->sample(isect.uv, isect.p), cosTheta);
     return F * Ks->sample(isect.uv, isect.p) / cosTheta;
 }
 
 GFColor GGlossyMaterial::Sample_f(GSurfaceInteraction &isect, float &pdf) const
 {
-    float cosThetaO = dot(isect.wo, isect.normal);
+    float cosThetaO = dot(isect.wo, isect.shadingNormal);
     if(cosThetaO <= 0) return GColor::blackF;
     vec3 wh = Sample_wh(isect);
     float HoO = dot(isect.wo, wh);
     if(HoO <= 0) return GColor::blackF;
     isect.wi = reflect(isect.wo, wh);
-    float cosThetaI = dot(isect.wi, isect.normal);
-    bool isInSameHemisphere = (dot(isect.wo, isect.normal) * cosThetaI) > 0;
+    float cosThetaI = dot(isect.wi, isect.shadingNormal);
+    bool isInSameHemisphere = (dot(isect.wo, isect.shadingNormal) * cosThetaI) > 0;
     if(!isInSameHemisphere) return GColor::blackF;
     // wh space to wi space
     pdf = Pdf_wh(isect, wh) / (4 * HoO);
@@ -70,12 +70,12 @@ GFColor GGlossyMaterial::Sample_f(GSurfaceInteraction &isect, float &pdf) const
 
 GFColor GGlossyMaterial::f(const GSurfaceInteraction &isect) const
 {
-    float cosThetaO = dot(isect.wo, isect.normal);
-    float cosThetaI = dot(isect.wi, isect.normal);
+    float cosThetaO = dot(isect.wo, isect.shadingNormal);
+    float cosThetaI = dot(isect.wi, isect.shadingNormal);
     vec3 wh = isect.wi + isect.wo;
     if(cosThetaO == 0 || cosThetaI == 0) return GColor::blackF;
     wh.normalize();
-    float NoH = dot(wh, isect.normal);
+    float NoH = dot(wh, isect.shadingNormal);
     if(NoH <=0)  return GColor::blackF;
 
     GFColor KsColor = Ks->sample(isect.uv, isect.p);
@@ -88,8 +88,8 @@ GFColor GGlossyMaterial::f(const GSurfaceInteraction &isect) const
 
 float GGlossyMaterial::Pdf(const GSurfaceInteraction &isect) const
 {
-    float cosThetaO = dot(isect.wo, isect.normal);
-    float cosThetaI = dot(isect.wi, isect.normal);
+    float cosThetaO = dot(isect.wo, isect.shadingNormal);
+    float cosThetaI = dot(isect.wi, isect.shadingNormal);
     if(cosThetaI * cosThetaO <= 0) return 0;
     vec3 wh = (isect.wi + isect.wo).normalize();
     return Pdf_wh(isect, wh) / (4*dot(isect.wo, wh));
@@ -122,13 +122,13 @@ vec3 GGlossyMaterial::Sample_wh(const GSurfaceInteraction &isect) const
     cosTheta = 1/std::sqrt(1+tanTheta2);
     float sinTheta =std::sqrt(std::max(0., 1.-cosTheta*cosTheta));
     wh = vec3(sinTheta * std::cos(phi), sinTheta * std::sin(phi), cosTheta);
-    SameHemisphere(isect.normal, isect.wo, wh);
+    SameHemisphere(isect.shadingNormal, isect.wo, wh);
     return wh;
 }
 
 float GGlossyMaterial::Pdf_wh(const GSurfaceInteraction& isect, const GMath::vec3 &wh) const
 {
-    float NoH = dot(wh, isect.normal);
+    float NoH = dot(wh, isect.shadingNormal);
     float rough = roughness->sample(isect.uv, isect.p).x();
     return D_GGX(NoH, rough) * NoH;
 }
