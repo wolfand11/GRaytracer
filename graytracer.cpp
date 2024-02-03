@@ -177,6 +177,7 @@ void GRaytracer::CreateTestScene()
     }
     {
         auto mat = make_shared<GLambertianMaterial>();
+        /*
         auto triMesh0 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/cube.obj"), mat);
         //auto triMesh0 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/cube-front.obj"), mat);
         for(auto tri : triMesh0)
@@ -184,14 +185,16 @@ void GRaytracer::CreateTestScene()
             tri->SetT(vec3f(0, 0.5, 1));
             tri->SetR(vec3f(0, 45, 0));
         }
-        scene.add(triMesh0);
-        auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/cube-front.obj"), mat);
+        //scene.add(triMesh0);
+        */
+        auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/diablo3_pose/diablo3_pose.obj"), mat);
         for(auto tri : triMesh1)
         {
-            tri->SetT(vec3f(-1, 0.5, 1));
-            tri->SetR(vec3f(0, 45, 0));
+            tri->SetT(vec3f(0, 1, 1));
+            //tri->SetT(vec3f(-1, 0.5, 1));
+            tri->SetR(vec3f(0, 180, 0));
         }
-        //scene.add(triMesh1);
+        scene.add(triMesh1);
     }
     scene.BuildBVHTree();
 }

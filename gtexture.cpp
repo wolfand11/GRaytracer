@@ -23,6 +23,11 @@ GImageTexture::GImageTexture(const char *filepath)
     }
 }
 
+GImageTexture::GImageTexture(TGAImage image)
+    :image(image)
+{
+}
+
 GFColor GImageTexture::sample(double u, double v, const GMath::vec3 &p) const
 {
     GColor errorColor(255,0,255,255);

@@ -79,5 +79,6 @@ bool GTriangle::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &
     isect.time = ray.time;
     isect.SetFaceNormal(ray, wNormal);
     isect.wo = -ray.dir;
+    isect.uv = uv0 * alpha + uv1 * beta + uv2 *(1-alpha-beta);
     return true;
 }

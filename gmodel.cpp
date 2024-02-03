@@ -39,9 +39,27 @@ std::vector<std::shared_ptr<GTriangleModel> > GTriangleModel::CreateTriangleMesh
 std::vector<std::shared_ptr<GTriangleModel>>
 GTriangleModel::CreateTriangleMesh(std::shared_ptr<GOBJModel> objModel, std::shared_ptr<GMaterial> material)
 {
+    auto gray = std::make_shared<GSolidColor>(GColor::grayF);
     std::vector<std::shared_ptr<GTriangleModel>> trianges;
-    auto gray = std::make_shared<GCheckerTexture>(0.2, GColor::whiteF, GColor::grayF);
-    material->Init(gray, gray, gray);
+    std::shared_ptr<GTexture> diffuse;
+    if(objModel->diffusemap_.get_width() > 0)
+    {
+        diffuse = make_shared<GImageTexture>(objModel->diffusemap_);
+    }
+    else
+    {
+        diffuse = gray;
+    }
+    std::shared_ptr<GTexture> normal;
+    if(objModel->normalmap_.get_width() > 0)
+    {
+        normal = make_shared<GImageTexture>(objModel->normalmap_);
+    }
+    else
+    {
+        normal = std::make_shared<GSolidColor>(GColor::normalF);
+    }
+    material->Init(diffuse, gray, gray, normal);
     for(int i=0; i<objModel->nfaces(); i++)
     {
         auto triShape = std::make_shared<GTriangle>(objModel, i);

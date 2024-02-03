@@ -11,11 +11,12 @@ class GMaterial
 {
 public:
     virtual ~GMaterial() = default;
-    virtual void Init(shared_ptr<GTexture> Kd, shared_ptr<GTexture> Ks, shared_ptr<GTexture> roughness)
+    virtual void Init(shared_ptr<GTexture> Kd, shared_ptr<GTexture> Ks, shared_ptr<GTexture> roughness, shared_ptr<GTexture> normal)
     {
         this->Kd = Kd;
         this->Ks = Ks;
         this->roughness = roughness;
+        this->normal = normal;
     }
     virtual GFColor Sample_f(GSurfaceInteraction& isect, float& pdf) const;
     virtual GFColor f(const GSurfaceInteraction& isect) const = 0;
@@ -32,6 +33,7 @@ public:
     shared_ptr<GTexture> Kd;
     shared_ptr<GTexture> Ks;
     shared_ptr<GTexture> roughness;
+    shared_ptr<GTexture> normal;
 };
 
 

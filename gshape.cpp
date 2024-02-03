@@ -37,6 +37,7 @@ bool GSphere::intersect(const GRay &ray, GMath::interval ray_t, GSurfaceInteract
     vec3 outNormal = (isect.p - curCenter)/radius;
     isect.SetFaceNormal(ray, outNormal);
     isect.wo = -ray.dir;
+    isect.uv = getUV(isect.p);
     return true;
 }
 

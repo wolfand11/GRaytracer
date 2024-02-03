@@ -1,6 +1,8 @@
 #include "gobjmodel.h"
+#include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <regex>
 #include <sstream>
 using namespace GMath;
 using namespace std;
@@ -57,9 +59,22 @@ void GOBJModel::Setup(const std::string filename)
     }
     in.close();
     std::cerr << "# v# " << verts_.size() << " f# "  << nfaces() << " vt# " << uv_.size() << " vn# " << norms_.size() << std::endl;
-    //load_texture(filename, "_diffuse.tga",    diffusemap_);
-    //load_texture(filename, "_nm_tangent.tga", normalmap_);
-    //load_texture(filename, "_spec.tga",       specularmap_);
+    string diffusePath = std::regex_replace(filename, std::regex("\.obj"), "_diffuse.tga");
+    if(std::filesystem::exists(diffusePath))
+    {
+        if(!diffusemap_.read_tga_file(diffusePath))
+        {
+            std::cout << "load file failed! " << diffusePath << std::endl;
+        }
+    }
+    string normalPath = std::regex_replace(filename, std::regex("\.obj"), "_normal.tga");
+    if(std::filesystem::exists(normalPath))
+    {
+        if(!normalmap_.read_tga_file(normalPath))
+        {
+            std::cout << "load file failed! " << normalPath << std::endl;
+        }
+    }
 }
 
 int GOBJModel::nfaces() const {

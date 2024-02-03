@@ -56,6 +56,7 @@ class GImageTexture : public GTexture
 {
 public:
     GImageTexture(const char* filepath);
+    GImageTexture(TGAImage image);
 
     GFColor sample(double u, double v, const GMath::vec3& p)const override;
 private:
