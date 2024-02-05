@@ -10,6 +10,10 @@ int GUtils::screenWidth = 500;
 int GUtils::screenHeight = 500;
 float GUtils::worldSize= 2000.f;
 
+GDebugType GUtils::debugType = GDebugType::kNone;
+//GDebugType GUtils::debugType = GDebugType::kWorldNormal;
+//GDebugType GUtils::debugType = GDebugType::kWorldTangent;
+
 float GUtils::screenAspectRatio()
 {
     return (float)screenHeight/screenWidth;

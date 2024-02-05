@@ -173,7 +173,7 @@ void GRaytracer::CreateTestScene()
         auto sphereGObj1 = std::make_shared<GSphereModel>(100, checkerLambertMat);
         //auto sphereGObj1 = std::make_shared<GSphereModel>(100, redLambertMat);
         sphereGObj1->SetT(vec3f(0, -100, 1));
-        scene.add(sphereGObj1);
+        //scene.add(sphereGObj1);
     }
     {
         auto mat = make_shared<GLambertianMaterial>();
@@ -187,11 +187,14 @@ void GRaytracer::CreateTestScene()
         }
         //scene.add(triMesh0);
         */
-        //auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/diablo3_pose/diablo3_pose.obj"), mat);
-        auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/girl/DancingGirl.obj"), mat);
+        //auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/sphereTriangle.obj"), mat);
+        auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/diablo3_pose/diablo3_pose.obj"), mat);
+        //auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/girl/DancingGirl.obj"), mat);
+        //auto triMesh1 = GTriangleModel::CreateTriangleMesh(GUtils::GetAbsPath("models/plane.obj"), mat);
         for(auto tri : triMesh1)
         {
-            tri->SetT(vec3f(0, 1, 1));
+            //tri->SetT(vec3f(0, 0, 1));
+            tri->SetT(vec3f(0, 0.5, 0));
             //tri->SetT(vec3f(-1, 0.5, 1));
             tri->SetR(vec3f(0, 180, 0));
         }

@@ -1,5 +1,6 @@
 #include "gintegrator.h"
 #include "gsampler.h"
+#include "gutils.h"
 using namespace GMath;
 
 void GIntegrator::Render(GScene &scene)
@@ -79,7 +80,14 @@ GFColor GIntegrator::Li(GRay &ray, GScene &scene, int depth)
         GFColor f = isect.material->Sample_f(isect, pdf);
         if(GColor::IsBlack(f) || pdf==0.f) break;
 
-        beta = beta * f * absDot(isect.wi, isect.shadingNormal) / pdf;
+        if(GUtils::debugType!=GDebugType::kNone) // don't regenerate ray
+        {
+            break;
+        }
+        else
+        {
+            beta = beta * f * absDot(isect.wi, isect.shadingNormal) / pdf;
+        }
         specularBounce = isect.material->IsSpecular();
         ray.origin = isect.p;
         ray.dir = isect.wi;
@@ -107,7 +115,15 @@ GFColor GIntegrator::SampleLight(const GScene &scene, GSurfaceInteraction &isect
         GFColor Li = light->Sample_Li(scene, isect, wi, lightPdf);
         if(GColor::IsBlack(Li) || lightPdf == 0) continue;
         isect.wi = wi;
-        GFColor f = isect.material->f(isect) * absDot(wi, isect.shadingNormal);
+        GFColor f;
+        if(GUtils::debugType!=GDebugType::kNone)
+        {
+            f = isect.material->f(isect);
+        }
+        else
+        {
+            f = isect.material->f(isect) * absDot(wi, isect.shadingNormal);
+        }
         float scatteringPdf = isect.material->Pdf(isect);
         if(!GColor::IsBlack(f))
         {

@@ -1,6 +1,7 @@
 #include "gmaterial.h"
 #include "gsampler.h"
 #include "gmathutils.h"
+#include "gutils.h"
 
 using namespace std;
 using namespace GMath;
@@ -39,7 +40,25 @@ void GMaterial::SameHemisphere(const GMath::vec3& normal, const GMath::vec3& wo,
 
 GFColor GLambertianMaterial::f(const GSurfaceInteraction& isect) const
 {
-    GFColor KdColor = Kd->sample(isect.uv, isect.p);
+    GFColor KdColor;
+    if(GUtils::debugType==GDebugType::kNormalTex)
+    {
+        KdColor = normal->sample(isect.uv, isect.p);
+    }
+    else if(GUtils::debugType==GDebugType::kWorldNormal)
+    {
+        KdColor = GColor::whiteF;
+        KdColor.SetXYZ((isect.shadingNormal + vec3::one) * 0.5);
+    }
+    else if(GUtils::debugType==GDebugType::kWorldTangent)
+    {
+        KdColor = GColor::whiteF;
+        KdColor.SetXYZ((isect.tangent + vec3::one) * 0.5);
+    }
+    else
+    {
+        KdColor = Kd->sample(isect.uv, isect.p);
+    }
     return KdColor * M_INVERSE_PI;
 }
 

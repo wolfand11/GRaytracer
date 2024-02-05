@@ -75,6 +75,7 @@ bool GTriangle::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &
 
     vec3 localNormal = (normal0 * gamma + normal1 * beta + normal2 * alpha).normalize();
     vec3 localTangent = (tangent0 * gamma + tangent1 * beta + tangent2 * alpha).normalize();
+
     if(dot(localNormal, geoNormal) < 0)
     {
         localNormal = -localNormal;

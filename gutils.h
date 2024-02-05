@@ -12,6 +12,15 @@ enum GTextureWrapMode
     kTWMClamp
 };
 
+enum GDebugType
+{
+    kNone,
+    kDiffuseTex,
+    kNormalTex,
+    kWorldNormal,
+    kWorldTangent,
+};
+
 class GUtils
 {
 public:
@@ -19,6 +28,8 @@ public:
     static int screenHeight;
     static float screenAspectRatio();
     static float worldSize;
+
+    static GDebugType debugType;
 
     static std::string GetProjRootPath();
     static std::string GetAbsPath(const std::string& relativePath);

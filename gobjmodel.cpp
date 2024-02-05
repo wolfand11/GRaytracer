@@ -62,6 +62,10 @@ void GOBJModel::Setup(const std::string filename)
         }
     }
     in.close();
+
+    // gen tangent
+    GenTangent();
+
     std::cerr << "# v# " << verts_.size() << " f# "  << nfaces() << " vt# " << uv_.size() << " vn# " << norms_.size() << std::endl;
     string diffusePath = std::regex_replace(filename, std::regex("\.obj"), "_diffuse.tga");
     if(std::filesystem::exists(diffusePath))
@@ -95,6 +99,11 @@ int GOBJModel::nfaces() const {
     return facet_vrt_.size()/3;
 }
 
+int GOBJModel::nverts() const
+{
+    return verts_.size();
+}
+
 vec3 GOBJModel::vert(const int i) const {
     return verts_[i];
 }
@@ -119,10 +128,64 @@ double GOBJModel::specular(const vec2 &uvf) const {
     return specularmap_.get(uvf[0]*specularmap_.get_width(), uvf[1]*specularmap_.get_height())[0];
 }
 
+void GOBJModel::GenTangent()
+{
+    auto tmpTangent = std::vector<vec3>(nverts(),vec3::zero);
+    auto tmpBitangent = std::vector<vec3>(nverts(),vec3::zero);
+
+    for(int i=0; i<nfaces(); i++)
+    {
+        vec3 p0 = vert(i, 0);
+        vec3 p1 = vert(i, 1);
+        vec3 p2 = vert(i, 2);
+        vec2 uv0 = uv(i, 0);
+        vec2 uv1 = uv(i, 1);
+        vec2 uv2 = uv(i, 2);
+
+        vec3 q1 = p1 - p0;
+        vec3 q2 = p2 - p0;
+        auto s1 = uv1.x() - uv0.x();
+        auto s2 = uv2.x() - uv0.x();
+        auto t1 = uv1.y() - uv0.y();
+        auto t2 = uv2.y() - uv0.y();
+
+        vec3 tangent = (q1*t2 - q2*t1).normalize();
+        vec3 bitangent = (q2*s1 - q1*s2).normalize();
+        for(int j=0; j<3; j++)
+        {
+            tmpTangent[facet_nrm_[i*3+j]] = tmpTangent[facet_nrm_[i*3+j]] + tangent;
+            tmpBitangent[facet_nrm_[i*3+j]] = tmpBitangent[facet_nrm_[i*3+j]] + bitangent;
+        }
+    }
+
+    tans_.assign(nverts(), vec4::zero);
+    for(int i=0; i<nverts(); i++)
+    {
+        vec3 normal = norms_[i];
+        vec3 tangent = tmpTangent[i];
+        tangent = tangent - normal * dot(tangent, normal);
+        tans_[i].SetXYZ(tangent.normalize());
+
+        if(dot(cross(normal, tangent), tmpBitangent[i]) < 0.0f)
+        {
+            tans_[i].SetW(-1.0f);
+        }
+        else
+        {
+            tans_[i].SetW(+1.0f);
+        }
+    }
+}
+
 vec2 GOBJModel::uv(const int iface, const int nthvert) const {
     return uv_[facet_tex_[iface*3+nthvert]];
 }
 
 vec3 GOBJModel::normal(const int iface, const int nthvert) const {
     return norms_[facet_nrm_[iface*3+nthvert]];
+}
+
+vec4 GOBJModel::tangent(const int iface, const int nthvert) const
+{
+    return tans_[facet_nrm_[iface*3+nthvert]];
 }

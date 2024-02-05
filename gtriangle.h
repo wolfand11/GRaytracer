@@ -20,18 +20,26 @@ public:
         normal0 = objModel->normal(faceIndex, 0);
         normal1 = objModel->normal(faceIndex, 1);
         normal2 = objModel->normal(faceIndex, 2);
+
         u = p1 - Q;
         v = p2 - Q;
         auto tmpN = cross(u, v);
         geoNormal = tmpN;
-        D = dot(geoNormal.normalize(), Q);
+        if(dot(normal0, geoNormal.normalize()) < 0)
+        {
+            geoNormal = -geoNormal;
+        }
+        D = dot(geoNormal, Q);
         w = tmpN / dot(tmpN,tmpN); // I / 2*area
 
         // calc tangent space tangent
-        auto bitangent = vec3(uv2.x()-uv0.x(), 0, uv2.y() - uv0.y()).normalize();
-        tangent0 = cross(normal0, bitangent);
-        tangent1 = cross(normal1, bitangent);
-        tangent2 = cross(normal2, bitangent);
+        auto bitangent = vec3(uv2.x()-uv0.x(), uv2.y() - uv0.y(), 0).normalize();
+        //tangent0 = cross(normal0, bitangent);
+        //tangent1 = cross(normal1, bitangent);
+        //tangent2 = cross(normal2, bitangent);
+        tangent0 = objModel->tangent(faceIndex, 0).xyz();
+        tangent1 = objModel->tangent(faceIndex, 1).xyz();
+        tangent2 = objModel->tangent(faceIndex, 2).xyz();
 
         bbox = aabb(Q, p1, p2).pad();
         area =tmpN.length() * 0.5;
