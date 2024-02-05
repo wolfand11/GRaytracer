@@ -36,7 +36,9 @@ public:
             vec3f tNormal = (vec3f)normal->sample(isect.uv, isect.p).xyz().normalize();
             tNormal = tNormal * 2 - vec3f::one;
             vec3 wBitangent = cross(isect.tangent, isect.normal);
+            wBitangent.normalize();
             isect.shadingNormal = isect.tangent * tNormal.x() + wBitangent * tNormal.y() + isect.normal * tNormal.z();
+            isect.shadingNormal.normalize();
         }
         else
         {

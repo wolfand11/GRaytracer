@@ -64,23 +64,31 @@ bool GTriangle::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &
 
     vec3 localHitPos = localRayO + localRayDir * t;
     vec3 Q2HitPosVec = localHitPos - Q;
-    auto alpha = dot(w, cross(Q2HitPosVec, v));
-    auto beta = dot(w, cross(u, Q2HitPosVec));
-    if(alpha < 0 || 1<alpha || beta<0 || 1<beta || 1-alpha-beta<0 || 1-alpha-beta>1)
+    auto alpha = dot(w, cross(u, Q2HitPosVec));
+    auto beta = dot(w, cross(Q2HitPosVec, v));
+    auto gamma = 1-alpha-beta;
+    if(alpha < 0 || 1<alpha || beta<0 || 1<beta || gamma<0 || 1<gamma)
     {
+        // not in triangle
         return false;
     }
 
-    vec4f hitPos = (*obj2World) * (vec4f)embed<double,4>(localHitPos, 1.0);
-    vec4 wNormalTmp = (*world2Obj).transpose() * (vec4f)embed<double,4>(geoNormal, 0.0);
-    vec3 wNormal = wNormalTmp.xyz();
-    vec4 wTangent = (*obj2World) * (vec4f)embed<double,4>(geoTangent, 0.0);
+    vec3 localNormal = (normal0 * gamma + normal1 * beta + normal2 * alpha).normalize();
+    vec3 localTangent = (tangent0 * gamma + tangent1 * beta + tangent2 * alpha).normalize();
+    if(dot(localNormal, geoNormal) < 0)
+    {
+        localNormal = -localNormal;
+    }
+
+    vec4 hitPos = (*obj2World) * (vec4f)embed<double,4>(localHitPos, 1.0);
+    vec3 wNormal = (mat3)(world2Obj->get_minor(3,3).transpose()) * localNormal;
+    vec3 wTangent = (mat3)(obj2World->get_minor(3,3)) * localTangent;
     isect.p = hitPos.xyz();
     isect.t = t * rayScale;
     isect.time = ray.time;
-    isect.SetFaceNormal(ray, wNormal);
-    isect.tangent = wTangent.xyz();
+    isect.SetFaceNormal(ray, wNormal.normalize());
+    isect.tangent = wTangent.normalize();
     isect.wo = -ray.dir;
-    isect.uv = uv0 * alpha + uv1 * beta + uv2 *(1-alpha-beta);
+    isect.uv = uv0 * gamma + uv1 * beta + uv2 * alpha;
     return true;
 }

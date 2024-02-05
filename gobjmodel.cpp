@@ -18,7 +18,11 @@ void GOBJModel::Setup(const std::string filename)
     modelFilePath = filename;
     std::ifstream in;
     in.open (filename, std::ifstream::in);
-    if (in.fail()) return;
+    if (in.fail())
+    {
+        std::cerr << "open model failed. " << filename << std::endl;
+        return;
+    }
     std::string line;
     while (!in.eof())
     {
@@ -66,6 +70,11 @@ void GOBJModel::Setup(const std::string filename)
         {
             std::cout << "load file failed! " << diffusePath << std::endl;
         }
+        else
+        {
+            // we use OpenGL style uv
+            diffusemap_.flip_vertically();
+        }
     }
     string normalPath = std::regex_replace(filename, std::regex("\.obj"), "_normal.tga");
     if(std::filesystem::exists(normalPath))
@@ -73,6 +82,11 @@ void GOBJModel::Setup(const std::string filename)
         if(!normalmap_.read_tga_file(normalPath))
         {
             std::cout << "load file failed! " << normalPath << std::endl;
+        }
+        else
+        {
+            // we use OpenGL style uv
+            normalmap_.flip_vertically();
         }
     }
 }

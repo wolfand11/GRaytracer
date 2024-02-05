@@ -17,13 +17,21 @@ public:
         uv0 = objModel->uv(faceIndex, 0);
         uv1 = objModel->uv(faceIndex, 1);
         uv2 = objModel->uv(faceIndex, 2);
+        normal0 = objModel->normal(faceIndex, 0);
+        normal1 = objModel->normal(faceIndex, 1);
+        normal2 = objModel->normal(faceIndex, 2);
         u = p1 - Q;
         v = p2 - Q;
         auto tmpN = cross(u, v);
         geoNormal = tmpN;
-        geoTangent = cross(geoNormal.normalize(), v).normalize();
-        D = dot(geoNormal, Q);
-        w = tmpN / dot(tmpN,tmpN);
+        D = dot(geoNormal.normalize(), Q);
+        w = tmpN / dot(tmpN,tmpN); // I / 2*area
+
+        // calc tangent space tangent
+        auto bitangent = vec3(uv2.x()-uv0.x(), 0, uv2.y() - uv0.y()).normalize();
+        tangent0 = cross(normal0, bitangent);
+        tangent1 = cross(normal1, bitangent);
+        tangent2 = cross(normal2, bitangent);
 
         bbox = aabb(Q, p1, p2).pad();
         area =tmpN.length() * 0.5;
@@ -35,7 +43,6 @@ public:
 
     std::shared_ptr<GOBJModel> objModel;
     int faceIndex;
-    vec3 geoTangent;
     vec3 geoNormal;
     vec3 Q;
     vec3 u;
@@ -45,6 +52,12 @@ public:
     vec2 uv0;
     vec2 uv1;
     vec2 uv2;
+    vec3 normal0;
+    vec3 normal1;
+    vec3 normal2;
+    vec3 tangent0;
+    vec3 tangent1;
+    vec3 tangent2;
     double area;
 };
 #endif // GTRIANGLE_H
