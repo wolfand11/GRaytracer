@@ -6,6 +6,7 @@
 
 * 特性说明
   - 支持 Thin Lens Camera
+  - 支持 TriangleMesh
   - 支持多种 Material
     - 支持 Lambertian Material
     - 支持 Specular Material
@@ -20,4 +21,6 @@
     - 支持使用 Russian roulette 来截断 Path
     [[./02_path-integrator.jpg]]
 * ScreenShot
+  [[./02_triangle-mesh.jpg]]
+  [[./01_many-objs.jpg]]
   [[./01_area-light.jpg]]

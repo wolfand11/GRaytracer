@@ -10,7 +10,6 @@ public:
     GOBJModel(const std::string filename);
     void Setup(const std::string filename);
     int nfaces() const;
-    int nverts() const;
     GMath::vec3 normal(const int iface, const int nthvert) const;
     GMath::vec4 tangent(const int iface, const int nthvert) const;
     GMath::vec3 normal(const GMath::vec2 &uv) const;

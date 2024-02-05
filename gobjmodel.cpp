@@ -99,11 +99,6 @@ int GOBJModel::nfaces() const {
     return facet_vrt_.size()/3;
 }
 
-int GOBJModel::nverts() const
-{
-    return verts_.size();
-}
-
 vec3 GOBJModel::vert(const int i) const {
     return verts_[i];
 }
@@ -130,8 +125,9 @@ double GOBJModel::specular(const vec2 &uvf) const {
 
 void GOBJModel::GenTangent()
 {
-    auto tmpTangent = std::vector<vec3>(nverts(),vec3::zero);
-    auto tmpBitangent = std::vector<vec3>(nverts(),vec3::zero);
+    int normsCount = norms_.size();
+    auto tmpTangent = std::vector<vec3>(normsCount,vec3::zero);
+    auto tmpBitangent = std::vector<vec3>(normsCount,vec3::zero);
 
     for(int i=0; i<nfaces(); i++)
     {
@@ -158,8 +154,8 @@ void GOBJModel::GenTangent()
         }
     }
 
-    tans_.assign(nverts(), vec4::zero);
-    for(int i=0; i<nverts(); i++)
+    tans_.assign(normsCount, vec4::zero);
+    for(int i=0; i<normsCount; i++)
     {
         vec3 normal = norms_[i];
         vec3 tangent = tmpTangent[i];
