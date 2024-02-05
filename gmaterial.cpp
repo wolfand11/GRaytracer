@@ -64,11 +64,17 @@ GFColor GLambertianMaterial::f(const GSurfaceInteraction& isect) const
 
 GFColor GSpecularMaterial::Sample_f(GSurfaceInteraction& isect, float &pdf) const
 {
+    GFColor KsColor = Ks->sample(isect.uv, isect.p);
+    if(GColor::IsBlack(KsColor))
+    {
+        pdf = 0;
+        return GColor::blackF;
+    }
     isect.wi = reflect(isect.wo, isect.shadingNormal);
     pdf = 1;
     auto cosTheta = absDot(isect.wi, isect.shadingNormal);
-    GFColor F = SchlickFresnel(Ks->sample(isect.uv, isect.p), cosTheta);
-    return F * Ks->sample(isect.uv, isect.p) / cosTheta;
+    GFColor F = SchlickFresnel(KsColor, cosTheta);
+    return F * KsColor / cosTheta;
 }
 
 GFColor GGlossyMaterial::Sample_f(GSurfaceInteraction &isect, float &pdf) const

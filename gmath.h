@@ -283,11 +283,24 @@ GVect<T,n> proj(const GVect<T,m>& v)
 }
 
 template <typename T, int n>
-GVect<T,n> reflect(const GVect<T,n>& v, const GVect<T,n>& normal, bool normalize=true)
+GVect<T,n> reflect(const GVect<T,n>& wi, const GVect<T,n>& normal, bool normalize=true)
 {
-    auto ret = normal*2*dot(v,normal) - v;
+    auto ret = normal*2*dot(wi,normal) - wi;
     if(normalize) return ret.normalize();
     return ret;
+}
+
+template <typename T, int n>
+bool refract(const GVect<T,n>& wi, const GVect<T,n>& normal, T eta, GVect<T,n>& wt, bool normalize=true)
+{
+    T cosThetaI = dot(normal, wi);
+    T sin2ThetaI = std::max(0, 1 - cosThetaI*cosThetaI);
+    T sin2ThetaT = eta * eta * sin2ThetaI;
+    // total internal reflection
+    if(sin2ThetaT >= 1) return false;
+    T cosThetaT = std::sqrt(1-sin2ThetaT);
+    wt = eta * (-wi) + (eta * cosThetaI - cosThetaT) * normal;
+    return true;
 }
 
 template <typename T, int n>
