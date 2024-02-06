@@ -294,12 +294,12 @@ template <typename T, int n>
 bool refract(const GVect<T,n>& wi, const GVect<T,n>& normal, T eta, GVect<T,n>& wt, bool normalize=true)
 {
     T cosThetaI = dot(normal, wi);
-    T sin2ThetaI = std::max(0, 1 - cosThetaI*cosThetaI);
+    T sin2ThetaI = std::max(0.0, 1.0 - cosThetaI*cosThetaI);
     T sin2ThetaT = eta * eta * sin2ThetaI;
     // total internal reflection
     if(sin2ThetaT >= 1) return false;
     T cosThetaT = std::sqrt(1-sin2ThetaT);
-    wt = eta * (-wi) + (eta * cosThetaI - cosThetaT) * normal;
+    wt = normal * (eta * cosThetaI - cosThetaT) - wi * eta;
     return true;
 }
 

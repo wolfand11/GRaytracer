@@ -26,6 +26,7 @@ public:
     static GMath::mat4f EulerAngleToRotationMatrix(GMath::vec3f eulerAngle);
     static GMath::mat4f TRS(GMath::vec3f& translate, GMath::vec3f& rotation, GMath::vec3f& scale);
     static GMath::mat3f RotationMatrix(GMath::vec3f fromV, GMath::vec3f toV);
+    static void SameHemisphere(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi);
 
     // radian degree
     static float Rad2Deg(float rad);
@@ -34,6 +35,7 @@ public:
     static GMath::vec3f Deg2Rad(GMath::vec3f degree);
 
     // color helper
+    static GFColor SchlickFresnel(GFColor Ks, float cosTheta);
 };
 
 #endif // GMATHUTILS_H

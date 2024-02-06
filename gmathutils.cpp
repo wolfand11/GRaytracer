@@ -210,6 +210,16 @@ mat3f GMathUtils::RotationMatrix(GMath::vec3f fromV, GMath::vec3f toV)
     return ret.transpose();
 }
 
+void GMathUtils::SameHemisphere(const vec3 &normal, const vec3 &wo, vec3 &wi)
+{
+    auto rot = GMathUtils::RotationMatrix(vec3::up, normal);
+    wi = rot * (vec3f)wi;
+    if(dot(wi, normal) * dot(wo, normal) < 0)
+    {
+        wi = -wi;
+    }
+}
+
 float GMathUtils::Rad2Deg(float rad)
 {
     return rad * 180.0f / M_PI;
@@ -236,4 +246,10 @@ vec3f GMathUtils::Deg2Rad(vec3f degree)
     angle[2] = Deg2Rad(degree[1]);
     angle[3] = Deg2Rad(degree[2]);
     return angle;
+}
+
+GFColor GMathUtils::SchlickFresnel(GFColor Ks, float cosTheta)
+{
+    auto pow5 =[](float v) {return v * v * v * v * v;};
+    return Ks + (GColor::whiteF - Ks) * pow5(1-cosTheta);
 }
