@@ -96,6 +96,7 @@ GFColor GDiffuseAreaLight::Sample_Li(const GScene &scene, const GSurfaceInteract
     newIsect.time = isect.time;
     if(!scene.intersect(shadowRay, ray_t, newIsect) || newIsect.light==this)
     {
+        newIsect = intr;
         return Le(scene, newIsect, -wi);
     }
     pdf = 0;

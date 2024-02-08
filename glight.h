@@ -84,9 +84,17 @@ public:
 
     GFColor Le(const GScene& scene, const GSurfaceInteraction& isect, const GMath::vec3& w) override;
     GFColor Sample_Li(const GScene& scene, const GSurfaceInteraction& isect, GMath::vec3& wi, float& pdf) override;
+
     aabb bBox() override
     {
-        return shape->bBox() + (vec3)_position;
+        aabb localBBox = shape->bBox();
+
+        const mat4f* obj2World; // obj2World
+        const mat4f* world2Obj; // world2Obj
+        TRSInvertTRS(obj2World, world2Obj);
+
+        aabb wBBox = transformBBox(localBBox, *obj2World);
+        return wBBox;
     }
 
     bool twoSided;
@@ -103,6 +111,10 @@ public:
     }
 
     bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) override;
+    aabb bBox() override
+    {
+        return shape->bBox() + (vec3)_position;
+    }
 };
 
 class GMeshLight : public GDiffuseAreaLight
