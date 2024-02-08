@@ -49,7 +49,8 @@ bool GQuad::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &isec
     vec4 tmpRayDir = vec4::zero;
     tmpRayDir.SetXYZ(ray.dir);
     vec3 localRayDir = ((*world2Obj) * (vec4f)tmpRayDir).xyz();
-    double rayScale = localRayDir.length() / ray.dir.length();
+    //double rayScale = localRayDir.length() / ray.dir.length();
+    double rayScale = 1;
 
     auto DoN = dot(geoNormal, localRayDir);
     if(std::fabs(DoN) < 1e-8)
