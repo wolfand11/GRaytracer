@@ -9,7 +9,7 @@ using namespace GMath;
 GFColor GMaterial::Sample_f(GSurfaceInteraction& isect, float& pdf) const
 {
     isect.wi = GSampler::CosineSampleHemisphere();
-    SameHemisphere(isect.shadingNormal, isect.wo, isect.wi);
+    GMathUtils::SameHemisphere(isect.shadingNormal, isect.wo, isect.wi);
     pdf = Pdf(isect);
     return f(isect);
 }
@@ -25,16 +25,6 @@ float GMaterial::Pdf(const GSurfaceInteraction& isect) const
     else
     {
         return 0;
-    }
-}
-
-void GMaterial::SameHemisphere(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi) const
-{
-    auto rot = GMathUtils::RotationMatrix(vec3::up, normal);
-    wi = rot * (vec3f)wi;
-    if(dot(wi, normal) * dot(wo, normal) < 0)
-    {
-        wi = -wi;
     }
 }
 
@@ -62,7 +52,7 @@ GFColor GLambertianMaterial::f(const GSurfaceInteraction& isect) const
     return KdColor * M_INVERSE_PI;
 }
 
-GFColor GSpecularMaterial::Sample_f(GSurfaceInteraction& isect, float &pdf) const
+GFColor GSpecularReflectionMaterial::Sample_f(GSurfaceInteraction& isect, float &pdf) const
 {
     GFColor KsColor = Ks->sample(isect.uv, isect.p);
     if(GColor::IsBlack(KsColor))
@@ -73,8 +63,39 @@ GFColor GSpecularMaterial::Sample_f(GSurfaceInteraction& isect, float &pdf) cons
     isect.wi = reflect(isect.wo, isect.shadingNormal);
     pdf = 1;
     auto cosTheta = absDot(isect.wi, isect.shadingNormal);
-    GFColor F = SchlickFresnel(KsColor, cosTheta);
+    GFColor F = GMathUtils::SchlickFresnel(KsColor, cosTheta);
     return F * KsColor / cosTheta;
+}
+
+GFColor GSpecularRefractionMaterial::Sample_f(GSurfaceInteraction &isect, float &pdf) const
+{
+    GFColor KtColor = Kt->sample(isect.uv, isect.p);
+    if(GColor::IsBlack(KtColor))
+    {
+        pdf = 0;
+        return GColor::blackF;
+    }
+    bool entering = isect.isFrontFace;
+    float etaI = entering ? 1.0 : eta;
+    float etaT = entering ? eta : 1.0;
+
+    // tips: we trace ray from camera to scene, so wo is exit, wi is incidence
+    if(!refract(isect.wo, isect.shadingNormal, (double)etaI/etaT, isect.wi))
+    {
+        pdf = 0;
+        return GColor::blackF;
+    }
+    pdf = 1;
+    auto cosTheta = absDot(isect.wi, isect.shadingNormal);
+    GFColor KsColor = Ks->sample(isect.uv, isect.p);
+    GFColor F = GMathUtils::SchlickFresnel(KsColor, cosTheta);
+    GFColor ft = KtColor * (GColor::whiteF - F);
+    // https://www.pbr-book.org/3ed-2018/Light_Transport_III_Bidirectional_Methods/The_Path-Space_Measurement_Equation#fragment-Accountfornon-symmetrywithtransmissiontodifferentmedium-0
+    //if(false)
+    {
+        ft = ft * (etaI * etaI) / (etaT * etaT);
+    }
+    return ft / cosTheta;
 }
 
 GFColor GGlossyMaterial::Sample_f(GSurfaceInteraction &isect, float &pdf) const
@@ -105,7 +126,7 @@ GFColor GGlossyMaterial::f(const GSurfaceInteraction &isect) const
 
     GFColor KsColor = Ks->sample(isect.uv, isect.p);
 
-    GFColor F = SchlickFresnel(KsColor, NoH);
+    GFColor F = GMathUtils::SchlickFresnel(KsColor, NoH);
     float rough = roughness->sample(isect.uv, isect.p).x();
     GFColor ret = KsColor * D_GGX(NoH, rough) * F * V_SmithGGXCorrelatedFast(cosThetaO, cosThetaI, rough);
     return ret;
@@ -147,7 +168,7 @@ vec3 GGlossyMaterial::Sample_wh(const GSurfaceInteraction &isect) const
     cosTheta = 1/std::sqrt(1+tanTheta2);
     float sinTheta =std::sqrt(std::max(0., 1.-cosTheta*cosTheta));
     wh = vec3(sinTheta * std::cos(phi), sinTheta * std::sin(phi), cosTheta);
-    SameHemisphere(isect.shadingNormal, isect.wo, wh);
+    GMathUtils::SameHemisphere(isect.shadingNormal, isect.wo, wh);
     return wh;
 }
 

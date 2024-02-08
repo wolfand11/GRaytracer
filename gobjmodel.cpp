@@ -54,17 +54,28 @@ void GOBJModel::Setup(const std::string filename)
                 facet_nrm_.push_back(--n);
                 cnt++;
             }
-            if (3!=cnt) {
-                std::cerr << "Error: the obj file is supposed to be triangulated" << std::endl;
+            if (3!=cnt && 4!=cnt)
+            {
+                std::cerr << "Error: some face is not 3 or 4 edge. cnt = " << cnt << " . file = " << modelFilePath << std::endl;
                 in.close();
                 return;
             }
+            if(vertexPerFace!=-1 && vertexPerFace!=cnt)
+            {
+                std::cerr << "Error: some face is 3 edge,some face is 4 edge" << std::endl;
+                in.close();
+                return;
+            }
+            vertexPerFace = cnt;
         }
     }
     in.close();
 
     // gen tangent
-    GenTangent();
+    if(vertexPerFace==3)
+    {
+        GenTangent();
+    }
 
     std::cerr << "# v# " << verts_.size() << " f# "  << nfaces() << " vt# " << uv_.size() << " vn# " << norms_.size() << std::endl;
     string diffusePath = std::regex_replace(filename, std::regex("\.obj"), "_diffuse.tga");
@@ -96,7 +107,7 @@ void GOBJModel::Setup(const std::string filename)
 }
 
 int GOBJModel::nfaces() const {
-    return facet_vrt_.size()/3;
+    return facet_vrt_.size()/vertexPerFace;
 }
 
 vec3 GOBJModel::vert(const int i) const {
@@ -104,23 +115,7 @@ vec3 GOBJModel::vert(const int i) const {
 }
 
 vec3 GOBJModel::vert(const int iface, const int nthvert) const {
-    return verts_[facet_vrt_[iface*3+nthvert]];
-}
-
-TGAColor GOBJModel::diffuse(const vec2 &uvf) const {
-    return diffusemap_.get(uvf[0]*diffusemap_.get_width(), uvf[1]*diffusemap_.get_height());
-}
-
-vec3 GOBJModel::normal(const vec2 &uvf) const {
-    TGAColor c = normalmap_.get(uvf[0]*normalmap_.get_width(), uvf[1]*normalmap_.get_height());
-    vec3 res;
-    for (int i=0; i<3; i++)
-        res[2-i] = c[i]/255.*2 - 1;
-    return res;
-}
-
-double GOBJModel::specular(const vec2 &uvf) const {
-    return specularmap_.get(uvf[0]*specularmap_.get_width(), uvf[1]*specularmap_.get_height())[0];
+    return verts_[facet_vrt_[iface*vertexPerFace+nthvert]];
 }
 
 void GOBJModel::GenTangent()
@@ -174,14 +169,31 @@ void GOBJModel::GenTangent()
 }
 
 vec2 GOBJModel::uv(const int iface, const int nthvert) const {
-    return uv_[facet_tex_[iface*3+nthvert]];
+    return uv_[facet_tex_[iface*vertexPerFace+nthvert]];
 }
 
 vec3 GOBJModel::normal(const int iface, const int nthvert) const {
-    return norms_[facet_nrm_[iface*3+nthvert]];
+    return norms_[facet_nrm_[iface*vertexPerFace+nthvert]];
 }
 
 vec4 GOBJModel::tangent(const int iface, const int nthvert) const
 {
-    return tans_[facet_nrm_[iface*3+nthvert]];
+    return tans_[facet_nrm_[iface*vertexPerFace+nthvert]];
 }
+
+TGAColor GOBJModel::diffuse(const vec2 &uvf) const {
+    return diffusemap_.get(uvf[0]*diffusemap_.get_width(), uvf[1]*diffusemap_.get_height());
+}
+
+vec3 GOBJModel::normal(const vec2 &uvf) const {
+    TGAColor c = normalmap_.get(uvf[0]*normalmap_.get_width(), uvf[1]*normalmap_.get_height());
+    vec3 res;
+    for (int i=0; i<3; i++)
+        res[2-i] = c[i]/255.*2 - 1;
+    return res;
+}
+
+double GOBJModel::specular(const vec2 &uvf) const {
+    return specularmap_.get(uvf[0]*specularmap_.get_width(), uvf[1]*specularmap_.get_height())[0];
+}
+

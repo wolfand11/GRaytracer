@@ -55,13 +55,18 @@ GFColor GColor::Lerp(GFColor color1, GFColor color2, float f)
     return ret;
 }
 
-GColor GColor::Random(bool randomAlpha)
+GColor GColor::Random(ColorChannelType minLum, bool randomAlpha)
 {
-    return FromFloat01Color(RandomF(randomAlpha));
+    return FromFloat01Color(RandomF(minLum/255.0, randomAlpha));
 }
 
-GFColor GColor::RandomF(bool randomAlpha)
+GFColor GColor::RandomF(float minLum, bool randomAlpha)
 {
     GFColor ret(GSampler::Random(), GSampler::Random(), GSampler::Random(), randomAlpha?GSampler::Random():1);
+    if(ret.xyz().length2() < minLum*minLum)
+    {
+        auto index = GSampler::RandomInt(0,2);
+        ret[index] = std::min(1.0f, minLum+ret[index]);
+    }
     return ret;
 }

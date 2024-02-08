@@ -31,6 +31,9 @@ public:
     TGAImage normalmap_;
     TGAImage specularmap_;
     std::string modelFilePath;
+
+    // support 3 and 4
+    int vertexPerFace = -1;
 };
 
 #endif // GOBJMODEL_H

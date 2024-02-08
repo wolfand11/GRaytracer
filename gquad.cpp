@@ -1,26 +1,25 @@
-#include "gtriangle.h"
+#include "gquad.h"
 #include "ggameobject.h"
 #include "gsampler.h"
 
-GSurfaceInteraction GTriangle::Sample(float &pdf, double time) const
+GSurfaceInteraction GQuad::Sample(float &pdf, double time) const
 {
     const mat4f* obj2World; // obj2World
     const mat4f* world2Obj; // world2Obj
     this->owner->TRSInvertTRS(obj2World, world2Obj);
 
-    vec3 b = GSampler::UniformSampleTriangle();
-    vec3 localPos = Q * b.x() + (Q+u) * b.y() + (Q+v) * b.z();
-    vec2 uv = uv0 * b.x() + uv1 * b.y() + uv2 * b.z();
+    auto ksi0 = GSampler::Random();
+    auto ksi1 = GSampler::Random();
+    vec3 localPos = Q + u * ksi0 + v * ksi1;
     vec4 tmpWPos = ((*obj2World) * (vec4f)embed<double,4>(localPos, 1.));
     GSurfaceInteraction intr;
     intr.p = tmpWPos.xyz();
     intr.normal = geoNormal;
-    intr.uv = uv;
     pdf = 1.0/area;
     return intr;
 }
 
-GSurfaceInteraction GTriangle::Sample(const GSurfaceInteraction &ref, float &pdf) const
+GSurfaceInteraction GQuad::Sample(const GSurfaceInteraction &ref, float &pdf) const
 {
     GSurfaceInteraction intr = Sample(pdf, ref.time);
     vec3 wi = intr.p - ref.p;
@@ -38,7 +37,7 @@ GSurfaceInteraction GTriangle::Sample(const GSurfaceInteraction &ref, float &pdf
     return intr;
 }
 
-bool GTriangle::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &isect)
+bool GQuad::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &isect)
 {
     const mat4f* obj2World; // obj2World
     const mat4f* world2Obj; // world2Obj
@@ -66,30 +65,19 @@ bool GTriangle::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &
     vec3 Q2HitPosVec = localHitPos - Q;
     auto alpha = dot(w, cross(u, Q2HitPosVec));
     auto beta = dot(w, cross(Q2HitPosVec, v));
-    auto gamma = 1-alpha-beta;
-    if(alpha < 0 || 1<alpha || beta<0 || 1<beta || gamma<0 || 1<gamma)
+    if(alpha < 0 || 1<alpha || beta<0 || 1<beta)
     {
-        // not in triangle
+        // not in quad
         return false;
     }
 
-    vec3 localNormal = (normal0 * gamma + normal1 * beta + normal2 * alpha).normalize();
-    vec3 localTangent = (tangent0 * gamma + tangent1 * beta + tangent2 * alpha).normalize();
-
-    if(dot(localNormal, geoNormal) < 0)
-    {
-        localNormal = -localNormal;
-    }
-
     vec4 hitPos = (*obj2World) * (vec4f)embed<double,4>(localHitPos, 1.0);
-    vec3 wNormal = (mat3)(world2Obj->get_minor(3,3).transpose()) * localNormal;
-    vec3 wTangent = (mat3)(obj2World->get_minor(3,3)) * localTangent;
+    vec3 wNormal = (mat3)(world2Obj->get_minor(3,3).transpose()) * geoNormal;
     isect.p = hitPos.xyz();
     isect.t = t * rayScale;
     isect.time = ray.time;
     isect.SetFaceNormal(ray, wNormal.normalize());
-    isect.tangent = wTangent.normalize();
     isect.wo = -ray.dir;
-    isect.uv = uv0 * gamma + uv1 * beta + uv2 * alpha;
     return true;
 }
+

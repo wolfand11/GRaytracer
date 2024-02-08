@@ -18,17 +18,16 @@ public:
         this->roughness = roughness;
         this->normal = normal;
     }
+    virtual void InitTransmit(shared_ptr<GTexture> Kt, double eta)
+    {
+        this->Kt = Kt;
+        this->eta = eta;
+    }
     virtual GFColor Sample_f(GSurfaceInteraction& isect, float& pdf) const;
     virtual GFColor f(const GSurfaceInteraction& isect) const = 0;
     virtual float Pdf(const GSurfaceInteraction& isect) const;
 
-    void SameHemisphere(const GMath::vec3& normal, const GMath::vec3& wo, GMath::vec3& wi) const;
     virtual bool IsSpecular() { return false; }
-    GFColor SchlickFresnel(GFColor Ks, float cosTheta) const
-    {
-        auto pow5 =[](float v) {return v * v * v * v * v;};
-        return Ks + (GColor::whiteF - Ks) * pow5(1-cosTheta);
-    }
     void UpdateShadingNormal(GSurfaceInteraction& isect) const
     {
         if(normal!=nullptr)
@@ -50,6 +49,9 @@ public:
     shared_ptr<GTexture> Ks;
     shared_ptr<GTexture> roughness;
     shared_ptr<GTexture> normal;
+
+    shared_ptr<GTexture> Kt;
+    double eta;
 };
 
 
@@ -69,15 +71,15 @@ public:
     GFColor f(const GSurfaceInteraction& isect) const;
 };
 
-class GSpecularMaterial : public GMaterial
+class GSpecularReflectionMaterial : public GMaterial
 {
 public:
-    GSpecularMaterial()=default;
-    GSpecularMaterial(const GFColor& Ks)
+    GSpecularReflectionMaterial()=default;
+    GSpecularReflectionMaterial(const GFColor& Ks)
     {
         this->Ks = std::make_shared<GSolidColor>(Ks);
     }
-    GSpecularMaterial(shared_ptr<GTexture> Ks)
+    GSpecularReflectionMaterial(shared_ptr<GTexture> Ks)
     {
         this->Ks = Ks;
     }
@@ -91,8 +93,38 @@ public:
     {
         return 0;
     }
-    virtual bool IsSpecular() { return true; }
+    bool IsSpecular() override { return true; }
 };
+
+class GSpecularRefractionMaterial : public GMaterial
+{
+public:
+    GSpecularRefractionMaterial()=default;
+    GSpecularRefractionMaterial(const GFColor& Ks, const GFColor& Kt, double eta)
+    {
+        this->Ks = std::make_shared<GSolidColor>(Ks);
+        this->Kt = std::make_shared<GSolidColor>(Kt);
+        this->eta = eta;
+    }
+    GSpecularRefractionMaterial(shared_ptr<GTexture> Ks, shared_ptr<GTexture> Kt, double eta)
+    {
+        this->Ks = Ks;
+        this->Kt = Kt;
+        this->eta = eta;
+    }
+
+    GFColor Sample_f(GSurfaceInteraction& isect, float& pdf) const;
+    GFColor f(const GSurfaceInteraction& isect) const
+    {
+        return GColor::blackF;
+    }
+    float Pdf(const GSurfaceInteraction& isect) const
+    {
+        return 0;
+    }
+    bool IsSpecular() override { return true; }
+};
+
 
 class GGlossyMaterial : public GMaterial
 {

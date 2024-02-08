@@ -32,6 +32,7 @@ protected:
     void CreateScene();
     void CreateTestScene();
     void CreateMultiObjScene();
+    void CreateCornellBox();
     void SetupGRaytracer();
     void RefreshUI();
     void OnPreDraw();

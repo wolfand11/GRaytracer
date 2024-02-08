@@ -1,6 +1,7 @@
 #include "glight.h"
 #include "gscene.h"
 #include "gutils.h"
+#include "gtriangle.h"
 using namespace GMath;
 
 GLight::GLight(GLightType lightType, GFColor lColor)
@@ -108,10 +109,23 @@ bool GSphereLight::intersect(const GRay &ray, GMath::interval ray_t, GSurfaceInt
     if(sphere->intersect(ray, ray_t, isect))
     {
         isect.model = nullptr;
+        isect.material = material.get();
+        isect.material->UpdateShadingNormal(isect);
         isect.light = this;
         return true;
     }
     return false;
 }
 
-
+bool GMeshLight::intersect(const GRay &ray, interval ray_t, GSurfaceInteraction &isect)
+{
+    if(shape->intersect(ray, ray_t, isect))
+    {
+        isect.model = nullptr;
+        isect.material = material.get();
+        isect.material->UpdateShadingNormal(isect);
+        isect.light = this;
+        return true;
+    }
+    return false;
+}

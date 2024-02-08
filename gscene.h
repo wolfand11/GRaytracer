@@ -74,7 +74,7 @@ public:
         }
     }
 
-    void add(std::vector<std::shared_ptr<GTriangleModel> >& gObjList)
+    void add(std::vector<std::shared_ptr<GGameObject> >& gObjList)
     {
         for(auto& gobj : gObjList)
         {

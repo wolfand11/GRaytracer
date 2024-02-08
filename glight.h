@@ -79,6 +79,7 @@ public:
         :GLight(GLightType::kLTDiffuseArea, lColor),twoSided(twoSided),shape(shape)
     {
         shape->owner = this;
+        material = make_shared<GLambertianMaterial>(GColor::blackF);
     }
 
     GFColor Le(const GScene& scene, const GSurfaceInteraction& isect, const GMath::vec3& w) override;
@@ -90,6 +91,7 @@ public:
 
     bool twoSided;
     std::shared_ptr<GShape> shape;
+    std::shared_ptr<GMaterial> material;
 };
 
 class GSphereLight : public GDiffuseAreaLight
@@ -103,5 +105,32 @@ public:
     bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) override;
 };
 
-
+class GMeshLight : public GDiffuseAreaLight
+{
+public:
+    template<typename ShapeT>
+    static std::vector<std::shared_ptr<GGameObject>> CreateLights(const std::string objModelPath, GFColor lColor=GColor::whiteF, bool twoSided=true)
+    {
+        auto objModel = make_shared<GOBJModel>(objModelPath);
+        return CreateMeshLights(objModel, lColor, twoSided);
+    }
+    template<typename ShapeT>
+    static std::vector<std::shared_ptr<GGameObject>> CreateLights(std::shared_ptr<GOBJModel> objModel, GFColor lColor=GColor::whiteF, bool twoSided=true)
+    {
+        std::vector<std::shared_ptr<GGameObject>> lights;
+        for(int i=0; i<objModel->nfaces(); i++)
+        {
+            auto tShape = std::make_shared<ShapeT>(objModel, i);
+            auto light = std::make_shared<GMeshLight>(tShape, lColor, twoSided);
+            tShape->owner = light.get();
+            lights.push_back(light);
+        }
+        return lights;
+    }
+    GMeshLight(std::shared_ptr<GShape> shape, GFColor lColor=GColor::whiteF, bool twoSided=true)
+        :GDiffuseAreaLight(shape, lColor, twoSided)
+    {
+    }
+    bool intersect(const GRay& ray, GMath::interval ray_t, GSurfaceInteraction& isect) override;
+};
 #endif // GLIGHT_H

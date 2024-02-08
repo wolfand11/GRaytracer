@@ -27,6 +27,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         gaabb.cpp \
+        gbsdf.cpp \
         gbvh.cpp \
         gcamera.cpp \
         gcolor.cpp \
@@ -38,6 +39,7 @@ SOURCES += \
         gmathutils.cpp \
         gmodel.cpp \
         gobjmodel.cpp \
+        gquad.cpp \
         gray.cpp \
         graytracer.cpp \
         gsampler.cpp \
@@ -50,6 +52,7 @@ SOURCES += \
 
 HEADERS += \
         gaabb.h \
+        gbsdf.h \
         gbuffer.h \
         gbvh.h \
         gcamera.h \
@@ -64,6 +67,7 @@ HEADERS += \
         gmathutils.h \
         gmodel.h \
         gobjmodel.h \
+        gquad.h \
         gray.h \
         graytracer.h \
         gsampler.h \

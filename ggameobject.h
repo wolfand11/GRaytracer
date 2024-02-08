@@ -32,8 +32,8 @@ public:
     GMath::vec3f forward();
 protected:
     // common
-    GMath::vec3f _position;
-    GMath::vec3f _rotation;
+    GMath::vec3f _position = {0,0,0};
+    GMath::vec3f _rotation = {0,0,0};
     GMath::vec3f _scale = {1,1,1};
     bool _trs_dirty = true;
     GMath::mat4f transform;
