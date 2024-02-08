@@ -91,7 +91,7 @@ GFColor GDiffuseAreaLight::Sample_Li(const GScene &scene, const GSurfaceInteract
     }
     interval ray_t(0.001, rayDir.length()*0.999);
     wi = rayDir.normalize();
-    GRay shadowRay(isect.p, wi);
+    GRay shadowRay(isect.p, wi); // shadowRay from object to light, wi = (lightPos - objPos).normalize
     GSurfaceInteraction newIsect;
     newIsect.time = isect.time;
     if(!scene.intersect(shadowRay, ray_t, newIsect) || newIsect.light==this)

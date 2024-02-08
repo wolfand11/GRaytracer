@@ -112,7 +112,7 @@ public:
     static std::vector<std::shared_ptr<GGameObject>> CreateLights(const std::string objModelPath, GFColor lColor=GColor::whiteF, bool twoSided=true)
     {
         auto objModel = make_shared<GOBJModel>(objModelPath);
-        return CreateMeshLights(objModel, lColor, twoSided);
+        return CreateLights<ShapeT>(objModel, lColor, twoSided);
     }
     template<typename ShapeT>
     static std::vector<std::shared_ptr<GGameObject>> CreateLights(std::shared_ptr<GOBJModel> objModel, GFColor lColor=GColor::whiteF, bool twoSided=true)

@@ -7,6 +7,7 @@ void GIntegrator::Render(GScene &scene)
 {
     auto camera = scene.camera;
     for(int j=camera->viewportY; j<camera->viewportH; j++)
+    //for(int j=410; j<camera->viewportH; j++)
     {
         GLog::LogInfo(j, "/", camera->viewportH);
         for(int i=camera->viewportX; i<camera->viewportW; i++)

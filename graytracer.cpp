@@ -110,6 +110,7 @@ void GRaytracer::CreateScene()
     cameraGObj->LookAt(vec3f(0,1,-4), vec3f(0,1,0), vec3f(0,1,0));
     cameraGObj->SetViewport(0, 0, GUtils::screenWidth, GUtils::screenHeight);
     scene.camera = cameraGObj;
+    scene.camera->apertureRadius = 0;
     //if(true)
     if(false)
     {
@@ -126,7 +127,17 @@ void GRaytracer::CreateScene()
         {
             auto sphereLight = std::make_shared<GSphereLight>(0.25, GColor::whiteF*100);
             sphereLight->SetT(vec3f(-1.4, 2.5, 1));
-            scene.add(sphereLight);
+            //scene.add(sphereLight);
+        }
+        {
+            string cornellPath = GUtils::GetAbsPath("models/cornell_box4/");
+            using ShapeType = GQuad;
+            auto lights = GMeshLight::CreateLights<ShapeType>(cornellPath + "cornell_box-toplight.obj", GColor::whiteF*100);
+            for(auto light : lights)
+            {
+                light->SetT(vec3f(-1.4, 2.5, 1));
+            }
+            scene.add(lights);
         }
 
         CreateTestScene();
@@ -201,7 +212,7 @@ void GRaytracer::CreateTestScene()
             //tri->SetT(vec3f(-1, 0.5, 1));
             tri->SetR(vec3f(0, 90, 0));
         }
-        scene.add(objMesh);
+        //scene.add(objMesh);
     }
     {
         //auto mat = make_shared<GLambertianMaterial>();
@@ -336,24 +347,26 @@ void GRaytracer::CreateCornellBox()
     {
         auto sphereLight = std::make_shared<GSphereLight>(12, lightColor);
         sphereLight->SetT(vec3f(0, 60, 0));
-        scene.add(sphereLight);
+        //scene.add(sphereLight);
 
-        auto lights = GMeshLight::CreateLights<ShapeType>(cornellPath + "cornell_box-toplight.obj", lightColor);
+        auto lights = GMeshLight::CreateLights<ShapeType>(cornellPath + "cornell_box-toplight.obj", lightColor*20, false);
+        //auto lights = GMeshLight::CreateLights<ShapeType>(cornellPath + "cornell_box-toplight.obj", lightColor);
         for(auto light : lights)
         {
-            light->SetT(vec3f(0, -0.01, 0));
+            light->SetT(vec3f(0, scale.x()*0.9, 0));
+            light->SetS(vec3f(scale.x()*0.2, 1, scale.x()*0.2));
         }
-        //scene.add(lights);
+        scene.add(lights);
     }
     {
-        //auto objMesh = GMeshModel::CreateMesh<ShapeType>(cornellPath + "cornell_box.obj", whiteMat);
-        auto objMesh = GMeshModel::CreateMesh<ShapeType>(cornellPath + "cornell_box.obj", blueMat);
+        auto objMesh = GMeshModel::CreateMesh<ShapeType>(cornellPath + "cornell_box.obj", whiteMat);
+        //auto objMesh = GMeshModel::CreateMesh<ShapeType>(cornellPath + "cornell_box.obj", blueMat);
         for(auto tri : objMesh)
         {
             tri->SetS(scale);
             tri->SetR(vec3f(0, 90, 0));
         }
-        //scene.add(objMesh);
+        scene.add(objMesh);
         auto objMesh1 = GMeshModel::CreateMesh<ShapeType>(cornellPath + "cornell_box-left.obj", redMat);
         for(auto tri : objMesh1)
         {
@@ -371,23 +384,21 @@ void GRaytracer::CreateCornellBox()
         auto objMesh3 = GMeshModel::CreateMesh<ShapeType>(cornellPath + "cornell_box-box.obj", whiteMat);
         for(auto tri : objMesh3)
         {
-            //tri->SetT(vec3f(0.3*scale.x(), -0.35*scale.x(), -1.6*scale.x()));
-            //tri->SetT(vec3f(-0.3*scale.x(), -0.5, 0.3*scale.x()));
-            tri->SetS(scale*0.4);
-            //tri->SetR(vec3f(0, 15, 0));
+            tri->SetT(vec3f(0.3*scale.x(), -0.7*scale.x(), -0.4*scale.x()));
+            tri->SetS(scale*0.3);
+            tri->SetR(vec3f(0, 15, 0));
         }
         scene.add(objMesh3);
         auto objMesh4 = GMeshModel::CreateMesh<ShapeType>(cornellPath + "cornell_box-box.obj", whiteMat);
         for(auto tri : objMesh4)
         {
-            tri->SetT(vec3f(-0.3*scale.x(), -0.2*scale.x(), 0.3*scale.x()));
-            //tri->SetT(vec3f(-0.3*scale.x(), -0.5, 0.3*scale.x()));
-            vec3 tScale = scale*0.2;
+            tri->SetT(vec3f(-0.3*scale.x(), -0.4*scale.x(), 0.2*scale.x()));
+            vec3 tScale = scale*0.3;
             tScale.SetY(tScale.y()*2);
             tri->SetS(tScale);
-            //tri->SetR(vec3f(0, -15, 0));
+            tri->SetR(vec3f(0, -15, 0));
         }
-        //scene.add(objMesh4);
+        scene.add(objMesh4);
     }
     scene.BuildBVHTree();
 }
