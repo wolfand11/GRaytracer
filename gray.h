@@ -41,6 +41,7 @@ public:
     GRay yRay;
 };
 
+enum BxDFType;
 class GSurfaceInteraction
 {
 public:
@@ -57,6 +58,8 @@ public:
     GMaterial* material = nullptr;
     GModel* model = nullptr;
     GLight* light = nullptr;
+    BxDFType bxdfTypes;
+    BxDFType sampledBxDFType;
 
     void SetFaceNormal(const GRay& r, const vec3& outNormal)
     {
